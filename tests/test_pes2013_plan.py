@@ -26,7 +26,17 @@ def test_nothing_downloaded_nothing_added_nothing_stripped(tmp_path):
     assert p["sources"] == {} and p["game_files"] == [] and p["system_files"] == []
     assert p["strip"] == [] and p["options"] == [] and p["pending"] == [] and p["upgrades"] == []
     assert p["patches"] == [] and p["ini"] == [] and p["expect"] == {}
-    assert p["registry"] == {"machine": [], "user": []} and p["user_files"] == []
+    assert p["registry"]["user"] == [] and p["user_files"] == []
+
+def test_registry_is_what_the_games_installer_leaves(tmp_path):
+    # installdir and version as the PC installer writes them; the product code from the
+    # player's code.txt in the game folder, never a code of ours.
+    key = "Software\\Wow6432Node\\KONAMI\\PES2013"
+    machine = plan(tmp_path)["registry"]["machine"]
+    assert [(v["key"], v["name"]) for v in machine] == [(key, "installdir"), (key, "version"), (key, "code")]
+    assert machine[0]["string"] == "C:\\Games\\PES2013\\" and machine[1]["string"] == "1.00.0000"
+    code = machine[2]
+    assert code["from_file"] == "code.txt" and "string" not in code and "dword" not in code
 
 def test_our_dxvk_conf_is_the_only_text(tmp_path):
     p = plan(tmp_path)

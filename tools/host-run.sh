@@ -13,9 +13,6 @@
 # (settings.dat and the save) into the run prefix's user.
 #
 # HOST_DIR  as for tools/host-install.sh (default: ./host-check)
-# PES_CODE  your PES 2013 CD key, written where the game's installer puts it (the game won't
-#           start without it): "code" under [Software\\Wow6432Node\\KONAMI\\PES2013] in
-#           your own Wine prefix's system.reg
 # WINE      the host's wine (default: wine)
 # HEADLESS  WxH: run inside a headless gamescope of that size instead of on the desktop (no
 #           window, no focus taken); screenshots with
@@ -71,9 +68,9 @@ mkdir -p "$documents"
 rm -rf "$documents/KONAMI"
 cp -a "$from" "$documents/KONAMI"
 
-# The game's registry key (KONAMI\PES2013: installdir, version), as the install wrote it into
-# the installed prefix, and PES_CODE as its "code": the CD key the game's own installer stores
-# and pes2013.exe asks for at start, which no install of ours can write.
+# The game's registry key (KONAMI\PES2013: installdir, version and code, the product code the
+# install read from code.txt in the game folder), as the install wrote it into the installed
+# prefix. The values go through wine reg and are never printed.
 key='Software\Wow6432Node\KONAMI\PES2013'
 SECTION="[${key//\\/\\\\}]" awk 'index($0, ENVIRON["SECTION"]) == 1 { on = 1; next }
     on && /^$/ { exit }
@@ -82,9 +79,6 @@ SECTION="[${key//\\/\\\\}]" awk 'index($0, ENVIRON["SECTION"]) == 1 { on = 1; ne
     while IFS=$'\t' read -r name value; do
         WINEDEBUG=-all "$WINE" reg add "HKLM\\$key" /v "$name" /t REG_SZ /d "$value" /f >/dev/null
     done
-if [[ -n ${PES_CODE:-} ]]; then
-    WINEDEBUG=-all "$WINE" reg add "HKLM\\$key" /v code /t REG_SZ /d "$PES_CODE" /f >/dev/null
-fi
 wineserver -w
 
 # The profile's overrides (PES2013.json: dll_overrides): DXVK's d3d9/dxgi, dinput8 native first.

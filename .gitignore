@@ -20,3 +20,6 @@ __pycache__/
 # The host install check's copy, prefix and install (tools/host-install.sh).
 /host-check/
 /docs/superpowers/
+
+# A product code (code.txt in a game folder) is the player's own and never goes in the repo.
+code.txt

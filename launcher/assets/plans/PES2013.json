@@ -29,6 +29,11 @@
     "key": "Software\\Wow6432Node\\KONAMI\\PES2013",
     "name": "version",
     "string": "1.00.0000"
+   },
+   {
+    "key": "Software\\Wow6432Node\\KONAMI\\PES2013",
+    "name": "code",
+    "from_file": "code.txt"
    }
   ],
   "user": []

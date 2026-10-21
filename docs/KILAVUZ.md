@@ -20,6 +20,8 @@ bağlantısı yoktur.
   gibi eklemelerle) öyle kurar. Yalnızca `pes2013.exe` ve `img/` bulunmalıdır; eklenen tek
   dosya bizim `dxvk.conf` dosyamızdır.
 - İsterseniz kayıtlarınızı ve kadrolarınızı PC'den taşır (aşağıya bakın).
+- `code.txt` dosyanızdaki ürün kodunu, PC'deki kurulumun sakladığı gibi, önekteki oyun
+  ayarlarına (kayıt defterine) yazar.
 - PES'in `settings.exe` programı konsolda çalışmadığı için oyunun `settings.dat` dosyasını
   kendisi yazar: tam ekran, en yüksek kalite, kumanda XInput olarak ve sayfada seçilen
   çözünürlük.
@@ -44,13 +46,19 @@ bağlantısı yoktur.
    dosyasını indirin ve açın.
 2. İçindeki `PPSA99405` klasörünü FTP ile konsolda `/data/homebrew/PPSA99405/` konumuna
    kopyalayın. ShadowMount+ kutucuğu ekler; kutucuk görünmezse konsolu yeniden başlatın.
-3. PES 2013 klasörünüzün tamamını FTP ile `/data/futbol13/base-games/PES2013` konumuna
+3. PES 2013'ü PC'ye kurarken girdiğiniz ürün kodunu, girdiğiniz gibi, oyun klasörünün içinde
+   (`pes2013.exe` dosyasının yanında) `code.txt` adlı bir dosyaya tek satır olarak yazın.
+   Bunu klasörü kopyalamadan önce yapın ya da dosyayı sonradan FTP ile
+   `/data/futbol13/base-games/PES2013/` konumuna ekleyin. Bu dosya olmadan oyun kurulu
+   olmadığını söyler; sayfa da bunu belirtir.
+4. PES 2013 klasörünüzün tamamını FTP ile `/data/futbol13/base-games/PES2013` konumuna
    kopyalayın. Ya da bir USB belleğe `PES2013` adlı bir klasör olarak koyun; USB'deki kopya
    kurulum sırasında konsola aktarılır.
-4. İsterseniz kayıt klasörünüzü de kopyalayın (aşağıya bakın). Bunu **kurulumdan önce**
+5. İsterseniz kayıt klasörünüzü de kopyalayın (aşağıya bakın). Bunu **kurulumdan önce**
    yapın.
-5. FUTBOL13'ü açın ve **Yükle**'ye basın. FUTBOL13 oyununuzu öneke kopyalar, `dxvk.conf` ve
-   `settings.dat` dosyalarını yazar ve kayıt dosyalarınızı yerleştirir. Hiçbir şey
+6. FUTBOL13'ü açın ve **Yükle**'ye basın. FUTBOL13 oyununuzu öneke kopyalar, `dxvk.conf` ve
+   `settings.dat` dosyalarını yazar, ürün kodunuzu önekin kayıt defterine yazar ve kayıt
+   dosyalarınızı yerleştirir. Hiçbir şey
    indirilmez.
 
 Bundan sonra kutucuk oyunu doğrudan başlatır.
@@ -104,6 +112,9 @@ Dokunmatik yüzeyle fare kullanımı ve çıkış tuş kombinasyonu yalnızca bi
   `/data/homebrew/PPSA99405/` konumunda olduğunu kontrol edin.
 - **Oyun açılır açılmaz kapanıyor:** kopyanızı önce PC'de Wine altında deneyin. Orada
   açılmayan bir kopya burada da açılmaz. FUTBOL13 bir sonraki açılışta bunu söyler.
+- **Oyun "kurulu değil" diyor ya da kurulum `code.txt` istiyor:** ürün kodunuzu oyun
+  klasöründeki `code.txt` dosyasına tek satır olarak yazın (yukarıdaki 3. adım) ve yeniden
+  kurun ya da onarın.
 - **Kurulum hata veriyor:** PES 2013 klasörünün `/data/futbol13/base-games/PES2013`
   konumunda olduğunu ve `pes2013.exe` dosyasını ve `img` klasörünü içerdiğini kontrol edin.
   Sorun sürerse sayfadaki Onar (△) ile onarın.

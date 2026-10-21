@@ -11,6 +11,9 @@
 #           on the same btrfs/xfs as PES the copy is a reflink and costs no space; a save folder
 #           put in HOST_DIR/data/saves/PES2013/save/ beforehand is seeded into the prefix
 # BARE      the bare prefix zip (default: release/bare-prefix-futbol13.zip)
+# PES_CODE_FILE  a file holding your product code, for the check: copied into the copy as
+#           code.txt when the copy has none (as the player puts code.txt in the game folder on
+#           the console; your own folder is never changed). Without a code.txt the install stops.
 set -euo pipefail
 here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 L=$here/launcher
@@ -50,6 +53,16 @@ if [[ ! -f "$base/pes2013.exe" ]]; then
         exit 1
     fi
     mv "$base.part" "$base"
+fi
+# The product code the install writes into the registry, from code.txt in the game folder.
+if [[ -z $(find "$base" -maxdepth 1 -iname code.txt -print -quit) ]]; then
+    if [[ -n ${PES_CODE_FILE:-} ]]; then
+        [[ -f $PES_CODE_FILE ]] || { echo "no file at PES_CODE_FILE=$PES_CODE_FILE" >&2; exit 1; }
+        cp "$PES_CODE_FILE" "$base/code.txt"
+        echo "== code.txt copied into $base from PES_CODE_FILE"
+    else
+        echo "note: no code.txt in $base and no PES_CODE_FILE: the install will stop without one" >&2
+    fi
 fi
 mkdir -p "$win/prefixes" "$win/profiles"  # both are there on the console
 

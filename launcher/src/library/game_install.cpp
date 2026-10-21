@@ -1,6 +1,7 @@
 // Prospero BlackBox - A game installed into the shared prefix from its base copy and a plan.
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "library/game_install.hpp"
+#include "core/i18n.hpp"
 #include "core/save_file.hpp"
 #include "library/tree.hpp"
 #include "library/rtpatch.hpp"
@@ -499,16 +500,65 @@ std::string json_text(const std::string &text)
     return out + "\"";
 }
 
-bool apply_registry(WineRegistry &registry, const std::vector<RegistryValue> &values,
-                    std::time_t now, std::string &error)
+// A from_file value's text: the file in folder (any case), at most 4 KiB, its first line
+// trimmed of whitespace and a byte order mark. The text is a secret of the player's (a product
+// code): an error names the file only.
+bool value_from_file(const std::string &folder, const std::string &relative, std::string &value,
+                     std::string &error)
+{
+    const auto path = find_entry(folder, relative);
+    std::string text;
+    if (path.empty() || !is_file(path) || !hui::save::read_file(path, &text, 4096))
+    {
+        std::uint64_t size = 0;
+        error = !path.empty() && is_file(path, &size) && size > 4096
+                    ? i18n::trf("{0} in your game folder is too long. Put only the product code in it, "
+                                "on one line.",
+                                {relative})
+                    : i18n::trf("No {0} in your game folder. Put the product code you typed when "
+                                "installing the game on the PC in it, on one line.",
+                                {relative});
+        return false;
+    }
+    if (text.starts_with("\xEF\xBB\xBF"))
+        text.erase(0, 3);
+    const auto blank = [](char c) { return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f'; };
+    std::size_t start = 0;
+    while (start < text.size() && blank(text[start]))
+        ++start;
+    std::size_t end = start;
+    while (end < text.size() && text[end] != '\r' && text[end] != '\n')
+        ++end;
+    while (end > start && blank(text[end - 1]))
+        --end;
+    value = text.substr(start, end - start);
+    if (value.empty())
+    {
+        error = i18n::trf("No {0} in your game folder. Put the product code you typed when "
+                          "installing the game on the PC in it, on one line.",
+                          {relative});
+        return false;
+    }
+    return true;
+}
+
+// The values set in registry, from_file ones read from the game's folder. Nothing here logs a
+// value: errors name the key and the value's name only.
+bool set_values(WineRegistry &registry, const std::vector<RegistryValue> &values,
+                const std::string &game_folder, std::time_t now, std::string &error)
 {
     for (const auto &value : values)
+    {
+        std::string text = value.text;
+        if (!value.from_file.empty() && !value_from_file(game_folder, value.from_file, text, error))
+            return false;
         if (value.dword ? !registry.set_dword(value.key, value.name, value.number, now)
-                        : !registry.set_string(value.key, value.name, value.text, now))
+                        : !registry.set_string(value.key, value.name, text, now))
         {
             error = "Can't set " + value.key + "\\" + value.name + " (not printable ASCII)";
             return false;
         }
+    }
     return true;
 }
 } // namespace
@@ -983,6 +1033,23 @@ std::vector<OptionView> option_views(const InstallPlan &plan, const InstallPaths
     return views;
 }
 
+bool apply_registry(const InstallPlan &plan, const InstallPaths &paths, std::time_t now,
+                    std::string &error)
+{
+    const auto prefix = paths.win_root + "/prefixes/" + plan.prefix;
+    std::string game_folder;
+    resolve(prefix, "drive_c/Games/" + plan.game, false, game_folder);
+    WineRegistry machine, user;
+    if (!load_registry(prefix + "/system.reg", machine, error) ||
+        !load_registry(prefix + "/user.reg", user, error))
+        return false;
+    // Both are set before either file is written: a missing code.txt leaves them as they were.
+    return set_values(machine, plan.machine, game_folder, now, error) &&
+           set_values(user, plan.user, game_folder, now, error) &&
+           save_registry(prefix + "/system.reg", machine, error) &&
+           save_registry(prefix + "/user.reg", user, error);
+}
+
 bool install_game(const InstallPlan &given, const Manifest &manifest, const InstallPaths &paths,
                   const InstallOptions &options,
                   const std::function<void(const InstallStatus &)> &progress,
@@ -1044,6 +1111,14 @@ bool install_game(const InstallPlan &given, const Manifest &manifest, const Inst
     if (!load_registry(prefix + "/system.reg", machine, error) ||
         !load_registry(prefix + "/user.reg", user, error))
         return false;
+    // A value from a file the copy must hold (the product code in code.txt): the copy is
+    // installed as it is, so it is checked there now, before the long copy, and read again
+    // from the installed folder at the end.
+    for (const auto *values : {&plan.machine, &plan.user})
+        for (const auto &value : *values)
+            if (std::string unused; !value.from_file.empty() &&
+                                    !value_from_file(base.path, value.from_file, unused, error))
+                return false;
 
     std::uint64_t needed = 0;
     std::vector<std::string> used;
@@ -1275,10 +1350,7 @@ bool install_game(const InstallPlan &given, const Manifest &manifest, const Inst
         ++status.done;
         progress(status);
     }
-    if (!apply_registry(machine, plan.machine, options.now, error) ||
-        !apply_registry(user, plan.user, options.now, error) ||
-        !save_registry(prefix + "/system.reg", machine, error) ||
-        !save_registry(prefix + "/user.reg", user, error))
+    if (!apply_registry(plan, paths, options.now, error))
         return false;
     if (!install_profile(paths.win_root + "/profiles", plan.profile, plan.profile_after, error) ||
         !apply_user_files(plan, paths, error) || !apply_user_binaries(plan, paths, error) ||

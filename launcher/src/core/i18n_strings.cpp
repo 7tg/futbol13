@@ -92,6 +92,16 @@ const Row kStrings[] = {
       "first.",
       "Bitirmek için FUTBOL13'ü kapatıp yeniden açın. Eski sürüm açılırsa önce konsolu yeniden "
       "başlatın."}},
+    {{"No code.txt in the copy. Put the product code you typed when installing the game on the PC in "
+      "it, on one line, or the game will say it is not installed.",
+      "Kopyada code.txt yok. PC'ye kurarken girdiğiniz ürün kodunu tek satır olarak içine yazın; "
+      "yoksa oyun kurulu olmadığını söyler."}},
+    {{"{0} in your game folder is too long. Put only the product code in it, on one line.",
+      "Oyun klasörünüzdeki {0} çok uzun. İçine yalnızca ürün kodunu, tek satır olarak yazın."}},
+    {{"No {0} in your game folder. Put the product code you typed when installing the game on "
+      "the PC in it, on one line.",
+      "Oyun klasörünüzde {0} yok. PC'ye kurarken girdiğiniz ürün kodunu tek satır olarak içine "
+      "yazın."}},
     {{"Copied as it is, mods and updates included ({0}).",
       "Olduğu gibi kopyalanır, modlar ve güncellemeler dahil ({0})."}},
     {{"Copied to the console; the USB drive can go",

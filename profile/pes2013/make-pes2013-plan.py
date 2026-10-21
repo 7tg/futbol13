@@ -41,12 +41,14 @@ def plan():
         "texts": [{"to": "dxvk.conf", "body": text("dxvk.conf")}],
         "expect": {},
         # What the game's own installer leaves in the registry: pes2013.exe reads installdir at
-        # start, looks for img/dt00_*.img and dt05_*.img there, then reads "code", the player's
-        # CD key; with either missing it says "Pro Evolution Soccer 2013 has not been
-        # installed". The key is not in the game folder, so the plan can't write it.
+        # start, looks for img/dt00_*.img and dt05_*.img there, then reads "code", the product
+        # code the player typed when installing on the PC; with either missing it says "Pro
+        # Evolution Soccer 2013 has not been installed". The player puts that code in code.txt
+        # in the game folder, and the install writes it from there (never a code of ours).
         "registry": {"machine": [
             {"key": KEY, "name": "installdir", "string": "C:\\Games\\PES2013\\"},
             {"key": KEY, "name": "version", "string": "1.00.0000"},
+            {"key": KEY, "name": "code", "from_file": "code.txt"},
         ], "user": []},
         "user_files": [],
         # The player's save folder from /data/futbol13/saves/PES2013/save (options, edited

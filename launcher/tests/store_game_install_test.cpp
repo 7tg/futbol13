@@ -114,10 +114,12 @@ int main()
            pes.user_binaries[0].bytes.size() == 852 && pes.user_binaries[0].fields.size() == 2 &&
            pes.user_binaries[0].has_checksum && pes.user_binaries[0].checksum_at == 12);
     // The key the game's installer leaves and pes2013.exe looks for at start.
-    assert(pes.machine.size() == 2 && pes.user.empty() &&
+    assert(pes.machine.size() == 3 && pes.user.empty() &&
            pes.machine[0].key == "Software\\Wow6432Node\\KONAMI\\PES2013" &&
            pes.machine[0].name == "installdir" && pes.machine[0].text == "C:\\Games\\PES2013\\" &&
-           pes.machine[1].name == "version" && pes.machine[1].text == "1.00.0000");
+           pes.machine[1].name == "version" && pes.machine[1].text == "1.00.0000" &&
+           pes.machine[2].key == pes.machine[0].key && pes.machine[2].name == "code" &&
+           pes.machine[2].from_file == "code.txt" && pes.machine[2].text.empty() && !pes.machine[2].dword);
     std::string profile;
     assert(profile_text(pes.profile, profile, error));
 
@@ -316,6 +318,36 @@ int main()
     // The checksum itself: CRC-16/XMODEM's check value, NOT-ed.
     assert(crc16_xmodem_not("123456789") == 0xCE3C);
     assert(crc16_xmodem_not("") == 0xFFFF);
+    // A registry value from a file in the installed game folder (PES 2013's product code):
+    // exactly one of string, dword and from_file, and a plain relative path.
+    {
+        const std::string machine = "\"registry\": {\"machine\": [";
+        auto text = plan_text;
+        text.insert(text.find(machine) + machine.size(),
+                    "{\"key\": \"Software\\\\Game Co\\\\Game\", \"name\": \"code\", \"from_file\": "
+                    "\"code.txt\"}, ");
+        InstallPlan coded;
+        assert(parse_plan(text, coded, error));
+        assert(coded.machine.size() == 2 && coded.machine[0].name == "code" &&
+               coded.machine[0].from_file == "code.txt" && coded.machine[0].text.empty() &&
+               !coded.machine[0].dword && coded.machine[1].from_file.empty());
+        const auto value_refused = [&](std::string from, std::string to)
+        {
+            auto bad = text;
+            const auto at = bad.find(from);
+            assert(at != std::string::npos);
+            bad.replace(at, from.size(), to);
+            InstallPlan refused_plan;
+            return !parse_plan(bad, refused_plan, error) && error.find("registry") != std::string::npos;
+        };
+        assert(value_refused("\"from_file\": \"code.txt\"", "\"from_file\": \"code.txt\", \"string\": \"x\""));
+        assert(value_refused("\"from_file\": \"code.txt\"", "\"from_file\": \"code.txt\", \"dword\": 1"));
+        assert(value_refused("\"from_file\": \"code.txt\"", "\"string\": \"x\", \"dword\": 1"));
+        assert(value_refused("\"from_file\": \"code.txt\"", "\"from_file\": \"../code.txt\""));
+        assert(value_refused("\"from_file\": \"code.txt\"", "\"from_file\": \"/code.txt\""));
+        assert(value_refused("\"from_file\": \"code.txt\"", "\"from_file\": \"\""));
+        assert(value_refused("\"from_file\": \"code.txt\"", "\"from_file\": 3"));
+    }
     assert(!parse_plan("[]", plan, error) && plan.game == "GAME"); // nothing changed
 
     // The base copy (its names in other cases), the prefix and its registry, a save.
@@ -472,6 +504,59 @@ int main()
         assert(!install_game(other, game, paths, options, progress, go, error));
         assert(error.find("didn't come out as it should") != std::string::npos);
         assert(read(installed / "Game.exe") == "fixed EXe" && !fs::exists(installed.string() + ".installing"));
+    }
+
+    // A value read from a file in the installed game folder (PES 2013's product code in
+    // code.txt): found in any case, trimmed of whitespace and a byte order mark. Missing or
+    // empty, the registry is left as it is and the error names the file, never a value.
+    {
+        auto coded = plan;
+        RegistryValue code;
+        code.key = "Software\\Wow6432Node\\Game Co\\Game";
+        code.name = "code";
+        code.from_file = "code.txt";
+        coded.machine.push_back(code);
+        const std::string refusal = "No code.txt in your game folder. Put the product code you typed "
+                                    "when installing the game on the PC in it, on one line.";
+        const auto code_in_registry = [&]
+        {
+            WineRegistry written;
+            assert(load_registry((prefix / "system.reg").string(), written, error));
+            return written.string_value("Software\\Wow6432Node\\Game Co\\Game", "code");
+        };
+        assert(!code_in_registry());
+        assert(!apply_registry(coded, paths, options.now, error) && error == refusal);
+        assert(!code_in_registry());
+        put(installed / "CODE.TXT", "");
+        assert(!apply_registry(coded, paths, options.now, error) && error == refusal);
+        put(installed / "CODE.TXT", " \r\n\t\n");
+        assert(!apply_registry(coded, paths, options.now, error) && error == refusal);
+        put(installed / "CODE.TXT", std::string(5000, 'A')); // not one short line
+        assert(!apply_registry(coded, paths, options.now, error) &&
+               error.find("ABCD") == std::string::npos && error.find("AAAA") == std::string::npos);
+        put(installed / "CODE.TXT", " ABCD-1234 \r\n");
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "ABCD-1234");
+        put(installed / "CODE.TXT", "\xEF\xBB\xBF" "WXYZ-5678\n");
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "WXYZ-5678");
+        // The other values are written too, the file's text nowhere but its value.
+        assert(read(prefix / "system.reg").find("\"Install Dir\"=\"C:\\\\Games\\\\GAME\\\\\"") !=
+               std::string::npos);
+
+        // The install reads it from the copy, which it installs as it is; without one it stops
+        // before anything is copied, and the install before it stays.
+        fs::remove(installed / "CODE.TXT");
+        put(installed / "kept.txt", "from before");
+        steps.clear();
+        assert(!install_game(coded, game, paths, options, progress, go, error) && error == refusal);
+        assert(read(installed / "kept.txt") == "from before" && !fs::exists(installed.string() + ".installing"));
+        assert(std::find(steps.begin(), steps.end(), "Copying the base copy") == steps.end());
+        put(base / "Code.txt", "\xEF\xBB\xBF" "BASE-0001\r\n");
+        assert(install_game(coded, game, paths, options, progress, go, error));
+        assert(code_in_registry() == "BASE-0001" && read(installed / "Code.txt").find("BASE-0001") != std::string::npos);
+        fs::remove(base / "Code.txt");
+        assert(install_game(plan, game, paths, options, progress, go, error)); // as before, for what follows
     }
 
     // A cancelled install leaves the one before it.

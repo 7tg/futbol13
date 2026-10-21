@@ -36,6 +36,9 @@ struct Manifest
                                  // first release (the page shows the warning)
     bool unversioned = false;    // no version file and no releases: a copy with the entries is
                                  // ready and installed as it is, mods included (PES 2013)
+    const char *wanted_file = nullptr; // a file the copy should hold (PES 2013's code.txt): when
+                                       // it is not there the copy stays ready and warning is
+    const char *wanted_hint = nullptr; // this hint, translated
 };
 
 // The manifest for a base-games folder name (PES2013...), or nullptr.

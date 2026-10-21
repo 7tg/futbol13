@@ -1,5 +1,6 @@
 // Prospero BlackBox - Base games: found without regard to case, checked, imported whole.
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "core/i18n.hpp"
 #include "library/base_game.hpp"
 #include "third_party/miniz/miniz.h"
 #include <cassert>
@@ -180,10 +181,23 @@ int main()
         put(folder / "PES2013.EXE", std::string(10, 'x'));
         put(folder / "IMG/dt00_e.img", std::string(1000, 'd'));
         put(folder / "rld.dll", "mod");          // anything else is simply part of the copy
+        // No code.txt (the product code the game reads at start): ready, with the page's hint.
+        assert(pes->wanted_file && std::string(pes->wanted_file) == "code.txt");
         auto got = inspect(folder.string(), *pes);
+        assert(got.state == State::ready && got.version.empty());
+        assert(got.warning == "No code.txt in the copy. Put the product code you typed when installing "
+                              "the game on the PC in it, on one line, or the game will say it is not "
+                              "installed.");
+        store::i18n::set_language(store::i18n::Language::turkish);
+        got = inspect(folder.string(), *pes);
+        assert(got.state == State::ready && got.warning.starts_with("Kopyada code.txt yok."));
+        store::i18n::set_language(store::i18n::Language::english);
+        // With it, in any case: no warning.
+        put(folder / "Code.txt", "ABCD\n");
+        got = inspect(folder.string(), *pes);
         assert(got.state == State::ready && got.version.empty() && got.warning.empty());
         assert(got.detail.find("as it is") != std::string::npos);
-        assert(got.detail.find("(0 MB)") != std::string::npos); // 1013 bytes
+        assert(got.detail.find("(0 MB)") != std::string::npos); // 1018 bytes
         fs::remove_all(folder / "IMG");
         got = inspect(folder.string(), *pes);
         assert(got.state == State::incomplete && got.detail.find("img") != std::string::npos);

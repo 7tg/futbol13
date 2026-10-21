@@ -125,6 +125,16 @@ struct UserBinary
     std::size_t checksum_at = 0; // crc16-xmodem-not, the only kind
 };
 
+// Values written into the prefix's registry: machine ones into system.reg, user ones into
+// user.reg. Each has exactly one of string, dword and from_file. from_file is a file in the
+// installed game folder (matched without regard to case, so also one in the user's copy, which
+// is installed as it is) whose text is the value: one line, trimmed of whitespace and a byte
+// order mark (PES 2013's product code, which the player puts in code.txt). The install stops
+// when it is missing or empty, and its text is never logged or shown.
+//   "registry": {"machine": [{"key": "Software\\Wow6432Node\\KONAMI\\PES2013",
+//                             "name": "installdir", "string": "C:\\Games\\PES2013\\"},
+//                            {"key": "...", "name": "code", "from_file": "code.txt"}],
+//                "user": [{"key": "...", "name": "Resolution", "dword": 2399144048}]}
 struct RegistryValue
 {
     std::string key;  // single backslashes, relative to the file's root
@@ -132,6 +142,8 @@ struct RegistryValue
     bool dword = false;
     std::string text;         // a string value
     std::uint32_t number = 0; // a dword value
+    std::string from_file;    // the text of this file in the installed game folder, one line,
+                              // trimmed; the install stops when it is missing or empty
 };
 
 struct InstallPlan

@@ -147,11 +147,27 @@ void registry(Reader &read, yyjson_val *root, const char *key, std::vector<Regis
     yyjson_val *item = nullptr;
     yyjson_arr_foreach(list, index, count, item)
     {
-        const auto where = std::string(key) + "[" + std::to_string(index) + "]";
+        const auto where = std::string("registry ") + key + "[" + std::to_string(index) + "]";
+        if (!yyjson_is_obj(item))
+        {
+            read.fail(where + " must be an object");
+            return;
+        }
         RegistryValue value;
         value.key = read.text(item, "key", true, where);
         value.name = read.text(item, "name", false, where);
-        if (yyjson_obj_get(item, "dword"))
+        const int kinds = (yyjson_obj_get(item, "string") != nullptr) +
+                          (yyjson_obj_get(item, "dword") != nullptr) +
+                          (yyjson_obj_get(item, "from_file") != nullptr);
+        if (kinds > 1)
+            read.fail(where + ": only one of string, dword and from_file");
+        if (yyjson_obj_get(item, "from_file"))
+        {
+            value.from_file = read.text(item, "from_file", true, where);
+            if (!read.failed && !safe_relative(value.from_file))
+                read.fail(where + ": from_file is not a plain relative path");
+        }
+        else if (yyjson_obj_get(item, "dword"))
         {
             const auto number = read.number(item, "dword", true, where);
             if (number > 0xffffffffu)

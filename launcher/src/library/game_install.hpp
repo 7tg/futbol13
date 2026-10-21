@@ -118,6 +118,13 @@ bool install_game(const InstallPlan &plan, const Manifest &manifest, const Insta
 
 // The game's folder, its profile and its record removed. The prefix's shared files and
 // registry, and the saves, stay: other games use them.
+// The plan's registry values written into the prefix's system.reg and user.reg (install
+// runs it once the game's folder is in place). A from_file value is read from the installed
+// game folder; when that file is missing or empty neither file is changed and error says so,
+// naming the file. A value's text is never put in error or a log.
+bool apply_registry(const InstallPlan &plan, const InstallPaths &paths, std::time_t now,
+                    std::string &error);
+
 bool uninstall_game(const InstallPlan &plan, const InstallPaths &paths,
                     const InstallOptions &options, std::string &error);
 

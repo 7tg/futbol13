@@ -30,6 +30,11 @@ constexpr Manifest kPes = []
 {
     Manifest m{"PES2013", kPesFolders, kPesFiles, "", {}, {}};
     m.unversioned = true;
+    // The product code the player typed when installing on the PC: the game reads it from the
+    // registry at start, and the install writes it there from this file.
+    m.wanted_file = "code.txt";
+    m.wanted_hint = "No code.txt in the copy. Put the product code you typed when installing the game "
+                    "on the PC in it, on one line, or the game will say it is not installed.";
     return m;
 }();
 
@@ -238,6 +243,9 @@ BaseGame inspect(const std::string &folder, const Manifest &manifest)
                                   {join(mods)});
         return result;
     }
+    if (manifest.wanted_file && manifest.wanted_hint)
+        if (const auto path = find_entry(folder, manifest.wanted_file); path.empty() || !is_file(path))
+            result.warning = i18n::trs(manifest.wanted_hint);
     if (manifest.unversioned)
     {
         result.state = State::ready;
