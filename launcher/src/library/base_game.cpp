@@ -209,6 +209,80 @@ std::string find_entry(const std::string &folder, const std::string &relative)
     return path;
 }
 
+FileValue file_value(const std::string &folder, const std::string &relative, std::string &value)
+{
+    constexpr std::uint64_t kLimit = 4096;
+    const auto path = find_entry(folder, relative);
+    std::uint64_t size = 0;
+    if (path.empty() || !is_file(path, &size))
+        return FileValue::missing;
+    if (size > kLimit)
+        return FileValue::too_long;
+    const int fd = open(path.c_str(), O_RDONLY | O_CLOEXEC);
+    if (fd < 0)
+        return FileValue::missing;
+    std::string text;
+    char buffer[kLimit + 1];
+    for (;;)
+    {
+        const auto got = read(fd, buffer, sizeof buffer);
+        if (got < 0 && errno == EINTR)
+            continue;
+        if (got < 0)
+        {
+            close(fd);
+            return FileValue::missing;
+        }
+        if (got == 0)
+            break;
+        text.append(buffer, static_cast<std::size_t>(got));
+        if (text.size() > kLimit)
+        {
+            close(fd);
+            return FileValue::too_long;
+        }
+    }
+    close(fd);
+    if (text.starts_with("\xEF\xBB\xBF"))
+        text.erase(0, 3);
+    const auto blank = [](char c)
+    { return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f'; };
+    std::size_t start = 0;
+    while (start < text.size() && blank(text[start]))
+        ++start;
+    std::size_t end = start;
+    while (end < text.size() && text[end] != '\r' && text[end] != '\n')
+        ++end;
+    while (end > start && blank(text[end - 1]))
+        --end;
+    if (end == start)
+        return FileValue::empty;
+    value = text.substr(start, end - start);
+    return FileValue::found;
+}
+
+std::string file_value_error(FileValue state, const std::string &relative)
+{
+    switch (state)
+    {
+    case FileValue::found:
+        return {};
+    case FileValue::too_long:
+        return i18n::trf("{0} in your game folder is too long. Put only the product code in it, "
+                         "on one line.",
+                         {relative});
+    case FileValue::empty:
+        return i18n::trf("{0} in your game folder is empty. Put the product code you typed when "
+                         "installing the game on the PC in it, on one line.",
+                         {relative});
+    case FileValue::missing:
+        break;
+    }
+    return i18n::trf("No {0} in your game folder. Put the product code you typed when "
+                     "installing the game on the PC in it, on one line.",
+                     {relative});
+}
+
 BaseGame inspect(const std::string &folder, const Manifest &manifest)
 {
     BaseGame result;
@@ -244,7 +318,7 @@ BaseGame inspect(const std::string &folder, const Manifest &manifest)
         return result;
     }
     if (manifest.wanted_file && manifest.wanted_hint)
-        if (const auto path = find_entry(folder, manifest.wanted_file); path.empty() || !is_file(path))
+        if (std::string unused; file_value(folder, manifest.wanted_file, unused) != FileValue::found)
             result.warning = i18n::trs(manifest.wanted_hint);
     if (manifest.unversioned)
     {

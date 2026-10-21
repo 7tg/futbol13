@@ -111,6 +111,12 @@ std::vector<const Source *> missing_sources(const InstallPlan &plan, const std::
 // touched. False with error set. A failure before the new folder is swapped in leaves
 // the old one as it was; one after it (the prefix's files, registry, profile) is mended
 // by installing again.
+// The file the manifest wants in a copy (PES 2013's code.txt) is in folder and holds a value
+// (base_game.hpp's file_value): true too when the manifest wants none. False with error set to
+// the page's sentence, naming the file only. The install job checks it before it imports a
+// copy from USB; install_game checks it again.
+bool check_wanted_files(const Manifest &manifest, const std::string &folder, std::string &error);
+
 bool install_game(const InstallPlan &plan, const Manifest &manifest, const InstallPaths &paths,
                   const InstallOptions &options,
                   const std::function<void(const InstallStatus &)> &progress,

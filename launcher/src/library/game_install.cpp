@@ -500,46 +500,16 @@ std::string json_text(const std::string &text)
     return out + "\"";
 }
 
-// A from_file value's text: the file in folder (any case), at most 4 KiB, its first line
-// trimmed of whitespace and a byte order mark. The text is a secret of the player's (a product
-// code): an error names the file only.
+// A from_file value's text (base_game.hpp's file_value). The text is a secret of the
+// player's (a product code): an error names the file only.
 bool value_from_file(const std::string &folder, const std::string &relative, std::string &value,
                      std::string &error)
 {
-    const auto path = find_entry(folder, relative);
-    std::string text;
-    if (path.empty() || !is_file(path) || !hui::save::read_file(path, &text, 4096))
-    {
-        std::uint64_t size = 0;
-        error = !path.empty() && is_file(path, &size) && size > 4096
-                    ? i18n::trf("{0} in your game folder is too long. Put only the product code in it, "
-                                "on one line.",
-                                {relative})
-                    : i18n::trf("No {0} in your game folder. Put the product code you typed when "
-                                "installing the game on the PC in it, on one line.",
-                                {relative});
-        return false;
-    }
-    if (text.starts_with("\xEF\xBB\xBF"))
-        text.erase(0, 3);
-    const auto blank = [](char c) { return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f'; };
-    std::size_t start = 0;
-    while (start < text.size() && blank(text[start]))
-        ++start;
-    std::size_t end = start;
-    while (end < text.size() && text[end] != '\r' && text[end] != '\n')
-        ++end;
-    while (end > start && blank(text[end - 1]))
-        --end;
-    value = text.substr(start, end - start);
-    if (value.empty())
-    {
-        error = i18n::trf("No {0} in your game folder. Put the product code you typed when "
-                          "installing the game on the PC in it, on one line.",
-                          {relative});
-        return false;
-    }
-    return true;
+    const auto state = file_value(folder, relative, value);
+    if (state == FileValue::found)
+        return true;
+    error = file_value_error(state, relative);
+    return false;
 }
 
 // The values set in registry, from_file ones read from the game's folder. Nothing here logs a
@@ -1033,6 +1003,12 @@ std::vector<OptionView> option_views(const InstallPlan &plan, const InstallPaths
     return views;
 }
 
+bool check_wanted_files(const Manifest &manifest, const std::string &folder, std::string &error)
+{
+    std::string unused;
+    return !manifest.wanted_file || value_from_file(folder, manifest.wanted_file, unused, error);
+}
+
 bool apply_registry(const InstallPlan &plan, const InstallPaths &paths, std::time_t now,
                     std::string &error)
 {
@@ -1107,13 +1083,15 @@ bool install_game(const InstallPlan &given, const Manifest &manifest, const Inst
         error = "The Wine prefix " + prefix + " isn't there (or has no registry)";
         return false;
     }
-    WineRegistry machine, user;
-    if (!load_registry(prefix + "/system.reg", machine, error) ||
-        !load_registry(prefix + "/user.reg", user, error))
+    // Only checks that both registry files read: apply_registry loads them again at the end.
+    if (WineRegistry machine, user; !load_registry(prefix + "/system.reg", machine, error) ||
+                                    !load_registry(prefix + "/user.reg", user, error))
         return false;
     // A value from a file the copy must hold (the product code in code.txt): the copy is
     // installed as it is, so it is checked there now, before the long copy, and read again
     // from the installed folder at the end.
+    if (!check_wanted_files(manifest, base.path, error))
+        return false;
     for (const auto *values : {&plan.machine, &plan.user})
         for (const auto &value : *values)
             if (std::string unused; !value.from_file.empty() &&

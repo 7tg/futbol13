@@ -40,11 +40,12 @@ def plan():
         "ini": [],
         "texts": [{"to": "dxvk.conf", "body": text("dxvk.conf")}],
         "expect": {},
-        # What the game's own installer leaves in the registry: pes2013.exe reads installdir at
-        # start, looks for img/dt00_*.img and dt05_*.img there, then reads "code", the product
-        # code the player typed when installing on the PC; with either missing it says "Pro
-        # Evolution Soccer 2013 has not been installed". The player puts that code in code.txt
-        # in the game folder, and the install writes it from there (never a code of ours).
+        # The three values the game's own installer leaves in the registry: pes2013.exe reads
+        # installdir at start and looks for img/dt00_*.img and dt05_*.img there, version is the
+        # installer's, and "code" is the product code the player typed when installing on the
+        # PC; with installdir or code missing it says "Pro Evolution Soccer 2013 has not been
+        # installed". installdir and version are written as they are here; code comes from
+        # code.txt in the game folder, which the player fills (never a code of ours).
         "registry": {"machine": [
             {"key": KEY, "name": "installdir", "string": "C:\\Games\\PES2013\\"},
             {"key": KEY, "name": "version", "string": "1.00.0000"},

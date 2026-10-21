@@ -52,8 +52,10 @@ source. The app downloads nothing. FUTBOL13 is not affiliated with Konami or Son
    tile; reboot if it doesn't appear.
 2. Put your product code, as you typed it when installing PES 2013 on the PC, on one line in
    a file named `code.txt` inside the game folder (next to `pes2013.exe`) before you copy the
-   folder, or add it to `/data/futbol13/base-games/PES2013/` over FTP afterwards. Without it
-   the game says it is not installed, and the page says so too.
+   folder: a USB copy is imported as it is, so `code.txt` must be in its folder on the USB
+   drive, and a folder already in `/data/futbol13/base-games/PES2013/` must get it over FTP
+   before you press Install. Without it the game says it is not installed, and the page says
+   so too.
 3. Copy your whole PES 2013 folder to `/data/futbol13/base-games/PES2013` over FTP, or put it
    on a USB drive in a folder named `PES2013`. A USB copy is copied to the console as part of
    the install.

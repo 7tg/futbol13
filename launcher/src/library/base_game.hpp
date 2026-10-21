@@ -67,6 +67,21 @@ struct BaseGame
 // The game's folder resolved without regard to case ("" when there is none).
 std::string find_entry(const std::string &folder, const std::string &relative);
 
+// A value a copy keeps in a file of its folder (PES 2013's product code in code.txt).
+enum class FileValue
+{
+    found,
+    missing, // no such file (or it can't be read)
+    empty,   // nothing but blanks
+    too_long // over 4 KiB
+};
+// The file in folder (any case), at most 4 KiB: its first line, trimmed of whitespace and a
+// byte order mark, in value (found only). The text is a secret of the player's (a product
+// code): never log it.
+FileValue file_value(const std::string &folder, const std::string &relative, std::string &value);
+// The page's sentence for a file_value that isn't found, translated; it names the file only.
+std::string file_value_error(FileValue state, const std::string &relative);
+
 // How many times a version file's contents were read (not served from the CRC cache); for tests.
 unsigned crc_reads_for_test();
 

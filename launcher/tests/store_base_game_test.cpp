@@ -192,6 +192,10 @@ int main()
         got = inspect(folder.string(), *pes);
         assert(got.state == State::ready && got.warning.starts_with("Kopyada code.txt yok."));
         store::i18n::set_language(store::i18n::Language::english);
+        // An empty one (a byte order mark and blanks) is no better: the same hint.
+        put(folder / "Code.txt", "\xEF\xBB\xBF \r\n");
+        got = inspect(folder.string(), *pes);
+        assert(got.state == State::ready && got.warning.starts_with("No code.txt in the copy."));
         // With it, in any case: no warning.
         put(folder / "Code.txt", "ABCD\n");
         got = inspect(folder.string(), *pes);

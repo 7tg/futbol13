@@ -10,8 +10,8 @@
 # gone, so the SDK is built from source: the repository's ps5-opengl submodule (the fork
 # github.com/mpereiraesaa/ps5-opengl) at `commit`, by tools/build-opengl-sdk.sh (the
 # opengl-sdk step of tools/build.sh), which reads the version and commit from here. The build
-# is reproducible, so the hashes below are its output's: built at /w/futbol13, the path its
-# static libraries hold (Sahin's hashes are for /w/sahin). The archive is taken from
+# is reproducible, so the hashes below are its output's: built in tools/build.sh's pinned
+# container at /w/futbol13, the path its static libraries hold (Sahin's hashes are for /w/sahin). The archive is taken from
 # .deps/ps5-opengl/ or PS5_OPENGL_ARCHIVE; nothing is downloaded.
 
 set -euo pipefail

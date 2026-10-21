@@ -48,9 +48,10 @@ bağlantısı yoktur.
    kopyalayın. ShadowMount+ kutucuğu ekler; kutucuk görünmezse konsolu yeniden başlatın.
 3. PES 2013'ü PC'ye kurarken girdiğiniz ürün kodunu, girdiğiniz gibi, oyun klasörünün içinde
    (`pes2013.exe` dosyasının yanında) `code.txt` adlı bir dosyaya tek satır olarak yazın.
-   Bunu klasörü kopyalamadan önce yapın ya da dosyayı sonradan FTP ile
-   `/data/futbol13/base-games/PES2013/` konumuna ekleyin. Bu dosya olmadan oyun kurulu
-   olmadığını söyler; sayfa da bunu belirtir.
+   Bunu klasörü kopyalamadan önce yapın: USB'deki kopya olduğu gibi aktarılır, bu yüzden
+   `code.txt` USB bellekteki klasörün içinde olmalıdır; `/data/futbol13/base-games/PES2013/`
+   konumundaki bir klasöre ise dosyayı Yükle'ye basmadan önce FTP ile ekleyin. Bu dosya
+   olmadan oyun kurulu olmadığını söyler; sayfa da bunu belirtir.
 4. PES 2013 klasörünüzün tamamını FTP ile `/data/futbol13/base-games/PES2013` konumuna
    kopyalayın. Ya da bir USB belleğe `PES2013` adlı bir klasör olarak koyun; USB'deki kopya
    kurulum sırasında konsola aktarılır.

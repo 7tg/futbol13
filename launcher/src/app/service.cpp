@@ -538,6 +538,10 @@ bool Service::game_job(const catalog::Entry &entry, bool remove, const std::stri
             return false;
         }
     }
+    // The file the copy must hold (PES 2013's code.txt), checked where the copy is now: a USB
+    // copy without one is refused before it is copied to the console.
+    if (!library::check_wanted_files(*manifest, base.path, error))
+        return false;
     {
         std::vector<std::pair<std::string, std::uint64_t>> files;
         std::vector<std::string> dirs;

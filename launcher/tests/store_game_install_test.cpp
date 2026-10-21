@@ -527,13 +527,23 @@ int main()
         assert(!code_in_registry());
         assert(!apply_registry(coded, paths, options.now, error) && error == refusal);
         assert(!code_in_registry());
+        const std::string empty = "code.txt in your game folder is empty. Put the product code you "
+                                  "typed when installing the game on the PC in it, on one line.";
         put(installed / "CODE.TXT", "");
-        assert(!apply_registry(coded, paths, options.now, error) && error == refusal);
+        assert(!apply_registry(coded, paths, options.now, error) && error == empty);
         put(installed / "CODE.TXT", " \r\n\t\n");
-        assert(!apply_registry(coded, paths, options.now, error) && error == refusal);
+        assert(!apply_registry(coded, paths, options.now, error) && error == empty);
+        put(installed / "CODE.TXT", "\xEF\xBB\xBF"); // a byte order mark alone
+        assert(!apply_registry(coded, paths, options.now, error) && error == empty);
+        assert(!code_in_registry());
         put(installed / "CODE.TXT", std::string(5000, 'A')); // not one short line
         assert(!apply_registry(coded, paths, options.now, error) &&
-               error.find("ABCD") == std::string::npos && error.find("AAAA") == std::string::npos);
+               error == "code.txt in your game folder is too long. Put only the product code in it, "
+                        "on one line." &&
+               error.find("AAAA") == std::string::npos);
+        put(installed / "CODE.TXT", "CODE-1\nSECOND\n"); // the first line only
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "CODE-1");
         put(installed / "CODE.TXT", " ABCD-1234 \r\n");
         assert(apply_registry(coded, paths, options.now, error));
         assert(code_in_registry() == "ABCD-1234");
@@ -557,6 +567,27 @@ int main()
         assert(code_in_registry() == "BASE-0001" && read(installed / "Code.txt").find("BASE-0001") != std::string::npos);
         fs::remove(base / "Code.txt");
         assert(install_game(plan, game, paths, options, progress, go, error)); // as before, for what follows
+    }
+
+    // The manifest's wanted file (PES 2013's code.txt), checked in a copy before the install job
+    // imports it from USB: none wanted, or there with a value, passes; missing or empty doesn't.
+    {
+        const auto folder = root / "wanted";
+        fs::create_directories(folder);
+        assert(!game.wanted_file && check_wanted_files(game, folder.string(), error));
+        Manifest wants = game;
+        wants.wanted_file = "code.txt";
+        error.clear();
+        assert(!check_wanted_files(wants, folder.string(), error) &&
+               error == "No code.txt in your game folder. Put the product code you typed when "
+                        "installing the game on the PC in it, on one line.");
+        put(folder / "Code.TXT", " \t\r\n");
+        assert(!check_wanted_files(wants, folder.string(), error) &&
+               error == "code.txt in your game folder is empty. Put the product code you typed "
+                        "when installing the game on the PC in it, on one line.");
+        put(folder / "Code.TXT", "WANT-0001\n");
+        error.clear();
+        assert(check_wanted_files(wants, folder.string(), error) && error.empty());
     }
 
     // A cancelled install leaves the one before it.

@@ -98,6 +98,9 @@ const Row kStrings[] = {
       "yoksa oyun kurulu olmadığını söyler."}},
     {{"{0} in your game folder is too long. Put only the product code in it, on one line.",
       "Oyun klasörünüzdeki {0} çok uzun. İçine yalnızca ürün kodunu, tek satır olarak yazın."}},
+    {{"{0} in your game folder is empty. Put the product code you typed when installing the game "
+      "on the PC in it, on one line.",
+      "Oyun klasörünüzdeki {0} boş. PC'ye kurarken girdiğiniz ürün kodunu tek satır olarak içine yazın."}},
     {{"No {0} in your game folder. Put the product code you typed when installing the game on "
       "the PC in it, on one line.",
       "Oyun klasörünüzde {0} yok. PC'ye kurarken girdiğiniz ürün kodunu tek satır olarak içine "
