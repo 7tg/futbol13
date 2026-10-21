@@ -577,6 +577,35 @@ int main()
         fs::remove_all(data / "saves");
     }
 
+    // A seed may be a folder (PES keeps its options, squads and EDIT file in one): every file
+    // under it, where that user has none, folders made on the way; never into Public.
+    {
+        auto text = plan_text;
+        const std::string seeds = "{\"from\": \"save.dat\", \"file\": \"Saved Games/Game Co/save.dat\"}";
+        text.replace(text.find(seeds), seeds.size(),
+                     "{\"from\": \"save\", \"file\": \"Documents/KONAMI/PES/save\"}");
+        InstallPlan folder;
+        assert(parse_plan(text, folder, error));
+        const auto users = prefix / "drive_c" / "users";
+        const auto mine = users / "steamuser" / "Documents" / "KONAMI" / "PES" / "save";
+        const auto theirs = users / "other" / "Documents" / "KONAMI" / "PES" / "save";
+        put(data / "saves" / "game" / "save" / "OPTION.bin", "seeded options");
+        put(data / "saves" / "game" / "save" / "sub" / "EDIT00000000", "seeded edit");
+        put(mine / "OPTION.bin", "played options");
+        fs::create_directories(users / "other");
+        put(users / "Public" / "keep", "");
+        assert(seed_user_files(folder, paths, error));
+        assert(read(mine / "OPTION.bin") == "played options");
+        assert(read(mine / "sub" / "EDIT00000000") == "seeded edit");
+        assert(read(theirs / "OPTION.bin") == "seeded options");
+        assert(read(theirs / "sub" / "EDIT00000000") == "seeded edit");
+        assert(!fs::exists(users / "Public" / "Documents"));
+        fs::remove_all(users / "steamuser");
+        fs::remove_all(users / "other");
+        fs::remove_all(users / "Public");
+        fs::remove_all(data / "saves");
+    }
+
     // The touchpad as the mouse (the default now): the plan's touchpad ini edits after its
     // own, and the profile's input; off, neither.
     {

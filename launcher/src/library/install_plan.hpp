@@ -83,6 +83,8 @@ struct UserFile
 // start from, copied on install into each Windows user's folder at <file> (every one but
 // Public) where that user has none yet: the game's own copy, once it has one, is never
 // replaced. Folders on the way are made. A missing <from> copies nothing.
+// <from> may be a folder: every file under it is copied to <file>/<relative path> where
+// that user has none.
 //   "user_seeds": [{"from": "blursave", "file": "AppData/Roaming/.../save/blursave"}]
 struct UserSeed
 {

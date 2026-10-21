@@ -819,6 +819,42 @@ bool apply_user_files(const InstallPlan &plan, const InstallPaths &paths, std::s
     return true;
 }
 
+namespace
+{
+// Every file under from, into user/relative where that user has none (folders made on the
+// way, each spelled as the user's folder already spells it). Links are not followed: an
+// entry that is one is skipped.
+bool seed_tree(const std::string &from, const std::string &user, const std::string &relative,
+               std::string &error)
+{
+    for (const auto &name : names_in(from))
+    {
+        const auto path = from + "/" + name;
+        if (is_directory(path))
+        {
+            if (!seed_tree(path, user, relative + "/" + name, error))
+                return false;
+            continue;
+        }
+        if (!is_file(path))
+            continue;
+        std::string to;
+        if (!resolve(user, relative + "/" + name, true, to))
+        {
+            error = "Can't make the folders for " + user + "/" + relative + "/" + name + ": " +
+                    std::strerror(errno);
+            return false;
+        }
+        struct stat info{};
+        if (lstat(to.c_str(), &info) == 0)
+            continue; // the game's own: kept
+        if (!copy_one(path, to, error))
+            return false;
+    }
+    return true;
+}
+} // namespace
+
 bool seed_user_files(const InstallPlan &plan, const InstallPaths &paths, std::string &error)
 {
     if (plan.user_seeds.empty())
@@ -837,6 +873,12 @@ bool seed_user_files(const InstallPlan &plan, const InstallPaths &paths, std::st
         {
             std::string from, to;
             resolve(saves, seed.from, false, from);
+            if (is_directory(from))
+            {
+                if (!seed_tree(from, users + "/" + user, seed.file, error))
+                    return false;
+                continue;
+            }
             if (!is_file(from))
                 continue;
             if (!resolve(users + "/" + user, seed.file, true, to))
