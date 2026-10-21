@@ -3,6 +3,7 @@
 #include "library/install_plan.hpp"
 #include "core/save_file.hpp"
 #include "third_party/yyjson/yyjson.h"
+#include <algorithm>
 #include <memory>
 
 namespace store::library
@@ -263,6 +264,81 @@ void user_files(Reader &read, yyjson_val *root, std::vector<UserFile> &out)
     }
 }
 
+void user_binaries(Reader &read, yyjson_val *root, std::vector<UserBinary> &out)
+{
+    auto *list = array(read, root, "user_binaries");
+    std::size_t index = 0, count = 0;
+    yyjson_val *item = nullptr;
+    yyjson_arr_foreach(list, index, count, item)
+    {
+        const auto where = "user_binaries[" + std::to_string(index) + "]";
+        if (!yyjson_is_obj(item))
+        {
+            read.fail(where + " must be an object");
+            return;
+        }
+        UserBinary binary;
+        binary.file = read.text(item, "file", true, where);
+        if (!safe_relative(binary.file))
+            read.fail(where + ": file is not a plain relative path");
+        const auto hex = read.text(item, "bytes", true, where);
+        const bool lower = std::all_of(hex.begin(), hex.end(), [](char c)
+                                       { return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'); });
+        if (!lower || !unhex(hex, binary.bytes))
+            read.fail(where + ": bytes must be lower-case hex, two digits a byte");
+        // Room for size bytes at an offset: at + size <= the template's length.
+        const auto fits = [&](yyjson_val *at, std::size_t size)
+        { return yyjson_is_uint(at) && yyjson_get_uint(at) <= binary.bytes.size() &&
+                 binary.bytes.size() - yyjson_get_uint(at) >= size; };
+        auto *fields = yyjson_obj_get(item, "fields");
+        if (fields && !yyjson_is_arr(fields))
+            read.fail(where + ": fields must be a list");
+        std::size_t inner = 0, inner_count = 0;
+        yyjson_val *field = nullptr;
+        if (yyjson_is_arr(fields))
+        yyjson_arr_foreach(fields, inner, inner_count, field)
+        {
+            const auto at_field = where + ": fields[" + std::to_string(inner) + "]";
+            auto *at = yyjson_is_obj(field) ? yyjson_obj_get(field, "at") : nullptr;
+            auto *value = yyjson_is_obj(field) ? yyjson_obj_get(field, "u32") : nullptr;
+            BinaryField parsed;
+            if (!fits(at, 4))
+            {
+                read.fail(at_field + ": at must be a whole number with four bytes of the file after it");
+                continue;
+            }
+            parsed.at = static_cast<std::size_t>(yyjson_get_uint(at));
+            if (yyjson_is_str(value) && yyjson_equals_str(value, "{width}"))
+                parsed.kind = BinaryField::Kind::width;
+            else if (yyjson_is_str(value) && yyjson_equals_str(value, "{height}"))
+                parsed.kind = BinaryField::Kind::height;
+            else if (yyjson_is_uint(value) && yyjson_get_uint(value) <= 0xffffffffu)
+                parsed.number = static_cast<std::uint32_t>(yyjson_get_uint(value));
+            else
+            {
+                read.fail(at_field + ": u32 must be \"{width}\", \"{height}\" or a whole number below 2^32");
+                continue;
+            }
+            binary.fields.push_back(parsed);
+        }
+        if (auto *checksum = yyjson_obj_get(item, "checksum"))
+        {
+            auto *kind = yyjson_is_obj(checksum) ? yyjson_obj_get(checksum, "kind") : nullptr;
+            auto *at = yyjson_is_obj(checksum) ? yyjson_obj_get(checksum, "at") : nullptr;
+            if (!yyjson_is_str(kind) || !yyjson_equals_str(kind, "crc16-xmodem-not"))
+                read.fail(where + ": checksum kind must be crc16-xmodem-not");
+            else if (!fits(at, 2))
+                read.fail(where + ": checksum at must be a whole number with two bytes of the file after it");
+            else
+            {
+                binary.has_checksum = true;
+                binary.checksum_at = static_cast<std::size_t>(yyjson_get_uint(at));
+            }
+        }
+        out.push_back(std::move(binary));
+    }
+}
+
 // What a plan and each of its options add to the game: placements, written files, ini
 // edits and the hashes the finished folder must have. label says where (an option's).
 void files(Reader &read, yyjson_val *root, std::vector<Placement> &game_files,
@@ -433,6 +509,7 @@ bool parse_plan(std::string_view text, InstallPlan &out, std::string &error)
     registry(read, reg, "user", plan.user);
     user_files(read, root, plan.user_files);
     user_seeds(read, root, plan.user_seeds);
+    user_binaries(read, root, plan.user_binaries);
 
     auto *profile = yyjson_obj_get(root, "profile");
     if (!profile || !yyjson_is_obj(profile))

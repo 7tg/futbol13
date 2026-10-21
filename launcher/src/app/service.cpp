@@ -387,7 +387,8 @@ bool Service::settings_job(const catalog::Entry &entry, library::Overlay overlay
             options.chosen.push_back(view.id);
     const auto chosen = library::effective_plan(plan, options);
     return library::install_profile(win_root + "/profiles", chosen.profile, chosen.profile_after, error) &&
-           library::apply_ini(chosen, paths, error) && library::apply_user_files(chosen, paths, error);
+           library::apply_ini(chosen, paths, error) && library::apply_user_files(chosen, paths, error) &&
+           library::apply_user_binaries(chosen, paths, error);
 }
 
 bool Service::game_plan(const catalog::Entry &entry, library::InstallPlan &plan,

@@ -4,6 +4,7 @@
 #include "library/base_game.hpp"
 #include "library/install_plan.hpp"
 #include <atomic>
+#include <cstdint>
 #include <ctime>
 #include <functional>
 #include <set>
@@ -149,6 +150,13 @@ bool apply_system_language(const InstallPlan &plan, const InstallPaths &paths, i
 bool apply_user_files(const InstallPlan &plan, const InstallPaths &paths, std::string &error);
 // The plan's user_seeds: the player's files from saves/<game>, where a user has none yet.
 bool seed_user_files(const InstallPlan &plan, const InstallPaths &paths, std::string &error);
+// The plan's user_binaries (install_plan.hpp) written whole into each Windows user's folder of
+// its prefix but Public, folders made on the way, with the plan's profile size and checksum
+// filled in: whatever was there is replaced. False with error set when one can't be written.
+bool apply_user_binaries(const InstallPlan &plan, const InstallPaths &paths, std::string &error);
+// The bitwise NOT of CRC-16/XMODEM (poly 0x1021, init 0, MSB first, no reflection) of data:
+// the checksum PES 2013 keeps in its settings.dat.
+std::uint16_t crc16_xmodem_not(std::string_view data);
 
 // The plan's options, each on or off as the last install (its record) chose, or as the plan
 // says when there is no install yet.

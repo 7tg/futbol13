@@ -819,6 +819,65 @@ bool apply_user_files(const InstallPlan &plan, const InstallPaths &paths, std::s
     return true;
 }
 
+std::uint16_t crc16_xmodem_not(std::string_view data)
+{
+    std::uint16_t crc = 0;
+    for (const unsigned char byte : data)
+    {
+        crc ^= static_cast<std::uint16_t>(byte << 8);
+        for (int bit = 0; bit < 8; ++bit)
+            crc = static_cast<std::uint16_t>(crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1);
+    }
+    return static_cast<std::uint16_t>(~crc);
+}
+
+bool apply_user_binaries(const InstallPlan &plan, const InstallPaths &paths, std::string &error)
+{
+    if (plan.user_binaries.empty())
+        return true;
+    std::string users;
+    resolve(paths.win_root + "/prefixes/" + plan.prefix, "drive_c/users", false, users);
+    const auto put = [](std::string &out, std::size_t at, std::uint32_t value, int size)
+    {
+        for (int i = 0; i < size; ++i)
+            out[at + i] = static_cast<char>(value >> (8 * i) & 0xff);
+    };
+    for (const auto &user : names_in(users))
+    {
+        // A user's own folder, not one reached through a link: nothing outside the prefix.
+        if (strcasecmp(user.c_str(), "Public") == 0 || !is_directory(users + "/" + user))
+            continue;
+        for (const auto &binary : plan.user_binaries)
+        {
+            std::string out = binary.bytes;
+            for (const auto &field : binary.fields)
+                put(out, field.at,
+                    field.kind == BinaryField::Kind::width    ? plan.profile.width
+                    : field.kind == BinaryField::Kind::height ? plan.profile.height
+                                                              : field.number,
+                    4);
+            if (binary.has_checksum)
+            {
+                put(out, binary.checksum_at, 0, 2);
+                put(out, binary.checksum_at, crc16_xmodem_not(out), 2);
+            }
+            std::string to;
+            if (!resolve(users + "/" + user, binary.file, true, to))
+            {
+                error = "Can't make the folders for " + user + "/" + binary.file + ": " +
+                        std::strerror(errno);
+                return false;
+            }
+            if (const auto failed = hui::save::write_atomic(to, out); !failed.empty())
+            {
+                error = "Can't write " + user + "/" + binary.file + ": " + failed;
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 namespace
 {
 // Every file under from, into user/relative where that user has none (folders made on the
@@ -1222,7 +1281,8 @@ bool install_game(const InstallPlan &given, const Manifest &manifest, const Inst
         !save_registry(prefix + "/user.reg", user, error))
         return false;
     if (!install_profile(paths.win_root + "/profiles", plan.profile, plan.profile_after, error) ||
-        !apply_user_files(plan, paths, error) || !seed_user_files(plan, paths, error))
+        !apply_user_files(plan, paths, error) || !apply_user_binaries(plan, paths, error) ||
+        !seed_user_files(plan, paths, error))
         return false;
 
     // ---- what was installed, for repair and updates ----

@@ -254,6 +254,63 @@ int main()
     assert(refused("\"mode\": \"full\"", "\"m o\": \"full\""));
     assert(refused("\"mode\": \"full\"", "\"mode\": 3"));
     assert(refused("\"attributes\": {", "\"attributes\": {}, \"x\": {"));
+    // Binary user files: a byte template, little-endian u32 fields at offsets inside it, and
+    // an optional checksum, all checked against the template's size.
+    assert(plan.user_binaries.empty());
+    const std::string binaries_text =
+        plan_text.substr(0, plan_text.size() - 1) +
+        ", \"user_binaries\": [{\"file\": \"Documents/KONAMI/PES/settings.dat\","
+        " \"bytes\": \"00000000000000000000000001000000\","
+        " \"fields\": [{\"at\": 0, \"u32\": \"{width}\"}, {\"at\": 4, \"u32\": \"{height}\"}, {\"at\": 8, \"u32\": 3}],"
+        " \"checksum\": {\"kind\": \"crc16-xmodem-not\", \"at\": 12}}]}";
+    InstallPlan binaries;
+    assert(parse_plan(binaries_text, binaries, error));
+    assert(binaries.user_binaries.size() == 1);
+    {
+        const auto &binary = binaries.user_binaries[0];
+        assert(binary.file == "Documents/KONAMI/PES/settings.dat" && binary.bytes.size() == 16 &&
+               binary.bytes[12] == 1 && binary.bytes[0] == 0);
+        assert(binary.fields.size() == 3 && binary.fields[0].kind == BinaryField::Kind::width &&
+               binary.fields[0].at == 0 && binary.fields[1].kind == BinaryField::Kind::height &&
+               binary.fields[1].at == 4 && binary.fields[2].kind == BinaryField::Kind::number &&
+               binary.fields[2].number == 3 && binary.fields[2].at == 8);
+        assert(binary.has_checksum && binary.checksum_at == 12);
+    }
+    const auto binary_refused = [&](std::string from, std::string to)
+    {
+        auto text = binaries_text;
+        const auto at = text.find(from);
+        assert(at != std::string::npos);
+        text.replace(at, from.size(), to);
+        InstallPlan bad;
+        return !parse_plan(text, bad, error) && error.find("user_binaries") != std::string::npos;
+    };
+    {
+        auto text = binaries_text;
+        const std::string checksum = ", \"checksum\": {\"kind\": \"crc16-xmodem-not\", \"at\": 12}";
+        text.erase(text.find(checksum), checksum.size());
+        InstallPlan plain;
+        assert(parse_plan(text, plain, error) && plain.user_binaries.size() == 1 &&
+               !plain.user_binaries[0].has_checksum);
+    }
+    assert(binary_refused("{\"at\": 8, \"u32\": 3}", "{\"at\": 14, \"u32\": 3}"));  // past the end
+    assert(binary_refused("{\"at\": 8, \"u32\": 3}", "{\"at\": -1, \"u32\": 3}"));
+    assert(binary_refused("{\"at\": 8, \"u32\": 3}", "{\"at\": 8, \"u32\": -3}"));
+    assert(binary_refused("{\"at\": 8, \"u32\": 3}", "{\"at\": 8, \"u32\": 4294967296}"));
+    assert(binary_refused("{\"at\": 8, \"u32\": 3}", "{\"at\": 8}"));
+    assert(binary_refused("\"u32\": \"{height}\"", "\"u32\": \"{depth}\""));
+    assert(binary_refused("01000000\"", "0100000\""));                              // odd length
+    assert(binary_refused("01000000\"", "0100000g\""));                             // not hex
+    assert(binary_refused("01000000\"", "0100000A\""));                             // lower-case only
+    assert(binary_refused("\"bytes\": \"00000000000000000000000001000000\"", "\"bytes\": \"\""));
+    assert(binary_refused("\"Documents/KONAMI", "\"../Documents/KONAMI"));
+    assert(binary_refused("\"Documents/KONAMI/PES/settings.dat\"", "\"../x\""));
+    assert(binary_refused("\"kind\": \"crc16-xmodem-not\", \"at\": 12", "\"kind\": \"crc16-xmodem-not\", \"at\": 15"));
+    assert(binary_refused("\"kind\": \"crc16-xmodem-not\"", "\"kind\": \"crc32\""));
+    assert(binary_refused("\"user_binaries\": [{", "\"user_binaries\": [3, {"));
+    // The checksum itself: CRC-16/XMODEM's check value, NOT-ed.
+    assert(crc16_xmodem_not("123456789") == 0xCE3C);
+    assert(crc16_xmodem_not("") == 0xFFFF);
     assert(!parse_plan("[]", plan, error) && plan.game == "GAME"); // nothing changed
 
     // The base copy (its names in other cases), the prefix and its registry, a save.
@@ -557,6 +614,72 @@ int main()
         fs::remove_all(outside);
         fs::remove_all(users / "Public");
         fs::remove_all(users / "me" / "AppData");
+    }
+
+    // A binary settings file written whole into each Windows user's folder (folders made on the
+    // way, never Public) from the plan's template: the picture size and the checksum filled in,
+    // and written again at a new size.
+    {
+        const fs::path binary_win = root / "binary-win";
+        const InstallPaths binary_paths{data.string(), binary_win.string()};
+        const auto users = binary_win / "prefixes" / binaries.prefix / "drive_c" / "users";
+        fs::create_directories(users / "steamuser");
+        fs::create_directories(users / "other");
+        fs::create_directories(users / "Public");
+        const auto xmodem_not = [](std::string body)
+        {
+            body[12] = body[13] = 0;
+            std::uint16_t value = 0;
+            for (const unsigned char c : body)
+            {
+                value ^= static_cast<std::uint16_t>(c << 8);
+                for (int bit = 0; bit < 8; ++bit)
+                    value = static_cast<std::uint16_t>(value & 0x8000 ? (value << 1) ^ 0x1021 : value << 1);
+            }
+            return static_cast<std::uint16_t>(~value);
+        };
+        const auto u32 = [](const std::string &body, std::size_t at)
+        {
+            std::uint32_t value = 0;
+            for (int i = 3; i >= 0; --i)
+                value = value << 8 | static_cast<unsigned char>(body[at + i]);
+            return value;
+        };
+        auto sized = binaries;
+        sized.profile.width = 1920;
+        sized.profile.height = 1080;
+        assert(apply_user_binaries(sized, binary_paths, error));
+        for (const char *user : {"steamuser", "other"})
+        {
+            const auto body = read(users / user / "Documents" / "KONAMI" / "PES" / "settings.dat");
+            assert(body.size() == 16 && u32(body, 0) == 1920 && u32(body, 4) == 1080 && u32(body, 8) == 3);
+            const auto sum = xmodem_not(body);
+            assert(static_cast<unsigned char>(body[12]) == (sum & 0xff) &&
+                   static_cast<unsigned char>(body[13]) == sum >> 8);
+            assert(body[14] == 0 && body[15] == 0 && crc16_xmodem_not(std::string(body).replace(12, 2, 2, '\0')) == sum);
+        }
+        assert(!fs::exists(users / "Public" / "Documents"));
+        sized.profile.width = 2560;
+        sized.profile.height = 1440;
+        assert(apply_user_binaries(sized, binary_paths, error));
+        {
+            const auto body = read(users / "steamuser" / "Documents" / "KONAMI" / "PES" / "settings.dat");
+            assert(body.size() == 16 && u32(body, 0) == 2560 && u32(body, 4) == 1440);
+            const auto sum = xmodem_not(body);
+            assert(static_cast<unsigned char>(body[12]) == (sum & 0xff) &&
+                   static_cast<unsigned char>(body[13]) == sum >> 8);
+        }
+        // No checksum: the template's bytes stay where it would go.
+        sized.user_binaries[0].has_checksum = false;
+        assert(apply_user_binaries(sized, binary_paths, error));
+        {
+            const auto body = read(users / "other" / "Documents" / "KONAMI" / "PES" / "settings.dat");
+            assert(body.size() == 16 && u32(body, 0) == 2560 && body[12] == 1 && body[13] == 0);
+        }
+        // A plan without any writes nothing.
+        fs::remove_all(users / "other" / "Documents");
+        assert(apply_user_binaries(plan, binary_paths, error) && !fs::exists(users / "other" / "Documents"));
+        fs::remove_all(binary_win);
     }
 
     // A save the player keeps in saves/<game> (any case): copied into each Windows user's folder

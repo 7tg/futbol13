@@ -92,6 +92,38 @@ struct UserSeed
     std::string file; // relative to the user's folder
 };
 
+// A file written whole for each Windows user from a byte template with fields filled in: a
+// game's binary settings file (PES 2013's settings.dat) that the page's picture size must win
+// over, so it is written on install, repair and every resolution change, replacing what is
+// there. Folders on the way are made; Public is left alone. Fields are little-endian 32-bit
+// values at byte offsets inside the template; "{width}" and "{height}" are the profile's
+// picture size, a number is written as it is. An optional checksum is computed last over the
+// whole file with its own bytes zeroed: "crc16-xmodem-not" is the bitwise NOT of
+// CRC-16/XMODEM (poly 0x1021, init 0), stored little-endian at "at". bytes is lower-case hex.
+//   "user_binaries": [{"file": "Documents/.../settings.dat", "bytes": "<hex>",
+//                      "fields": [{"at": 16, "u32": "{width}"}, {"at": 32, "u32": 1}],
+//                      "checksum": {"kind": "crc16-xmodem-not", "at": 12}}]
+struct BinaryField
+{
+    enum class Kind
+    {
+        number,
+        width,
+        height
+    };
+    std::size_t at = 0;
+    Kind kind = Kind::number;
+    std::uint32_t number = 0;
+};
+struct UserBinary
+{
+    std::string file;  // relative to the user's folder
+    std::string bytes; // the template, decoded
+    std::vector<BinaryField> fields;
+    bool has_checksum = false;
+    std::size_t checksum_at = 0; // crc16-xmodem-not, the only kind
+};
+
 struct RegistryValue
 {
     std::string key;  // single backslashes, relative to the file's root
@@ -120,6 +152,7 @@ struct InstallPlan
     std::vector<RegistryValue> user;    // user.reg
     std::vector<UserFile> user_files;   // the game's own settings, kept to the profile's
     std::vector<UserSeed> user_seeds;   // the player's files the game starts from
+    std::vector<UserBinary> user_binaries; // binary settings, written whole
     GameProfile profile;
     std::string profile_after; // profiles.lst: listed after this line, when it's there
     // Pieces of the finished setup the plan can't install yet (no pinned source):
