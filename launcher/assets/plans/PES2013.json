@@ -34,6 +34,31 @@
     "key": "Software\\Wow6432Node\\KONAMI\\PES2013",
     "name": "code",
     "from_file": "code.txt"
+   },
+   {
+    "key": "Hardware\\Description\\System\\CentralProcessor\\0",
+    "name": "~MHz",
+    "dword": 3500
+   },
+   {
+    "key": "Hardware\\Description\\System\\CentralProcessor\\0",
+    "name": "Identifier",
+    "string": "AMD64 Family 23 Model 71 Stepping 0"
+   },
+   {
+    "key": "Hardware\\Description\\System\\CentralProcessor\\0",
+    "name": "VendorIdentifier",
+    "string": "AuthenticAMD"
+   },
+   {
+    "key": "Hardware\\Description\\System\\CentralProcessor\\0",
+    "name": "ProcessorNameString",
+    "string": "AMD 4700S 8-Core Processor"
+   },
+   {
+    "key": "Hardware\\Description\\System\\CentralProcessor\\0",
+    "name": "FeatureSet",
+    "dword": 8191
    }
   ],
   "user": []

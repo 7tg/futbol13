@@ -14,6 +14,7 @@ ROOT = HERE.parents[1]
 OUT = ROOT / "launcher/assets/plans/PES2013.json"
 SAVE = "Documents/KONAMI/Pro Evolution Soccer 2013"
 KEY = "Software\\Wow6432Node\\KONAMI\\PES2013"  # the 32-bit game's HKLM\Software\KONAMI\PES2013
+CPU = "Hardware\\Description\\System\\CentralProcessor\\0"  # under HKLM, not redirected for a 32-bit game
 
 spec = importlib.util.spec_from_file_location("settings_dat", HERE / "settings_dat.py")
 settings_dat = importlib.util.module_from_spec(spec)
@@ -50,6 +51,14 @@ def plan():
             {"key": KEY, "name": "installdir", "string": "C:\\Games\\PES2013\\"},
             {"key": KEY, "name": "version", "string": "1.00.0000"},
             {"key": KEY, "name": "code", "from_file": "code.txt"},
+            # wineboot never runs on the console, so the prefix has no processor keys and a
+            # game that reads them (PES's system check reads ~MHz) finds nothing. The same
+            # silicon's own name, as the bare prefix's PROCESSOR_IDENTIFIER.
+            {"key": CPU, "name": "~MHz", "dword": 3500},
+            {"key": CPU, "name": "Identifier", "string": "AMD64 Family 23 Model 71 Stepping 0"},
+            {"key": CPU, "name": "VendorIdentifier", "string": "AuthenticAMD"},
+            {"key": CPU, "name": "ProcessorNameString", "string": "AMD 4700S 8-Core Processor"},
+            {"key": CPU, "name": "FeatureSet", "dword": 0x1FFF},
         ], "user": []},
         "user_files": [],
         # The player's save folder from /data/futbol13/saves/PES2013/save (options, edited

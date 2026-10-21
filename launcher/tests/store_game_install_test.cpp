@@ -114,12 +114,20 @@ int main()
            pes.user_binaries[0].bytes.size() == 852 && pes.user_binaries[0].fields.size() == 2 &&
            pes.user_binaries[0].has_checksum && pes.user_binaries[0].checksum_at == 12);
     // The key the game's installer leaves and pes2013.exe looks for at start.
-    assert(pes.machine.size() == 3 && pes.user.empty() &&
+    assert(pes.machine.size() == 8 && pes.user.empty() &&
            pes.machine[0].key == "Software\\Wow6432Node\\KONAMI\\PES2013" &&
            pes.machine[0].name == "installdir" && pes.machine[0].text == "C:\\Games\\PES2013\\" &&
            pes.machine[1].name == "version" && pes.machine[1].text == "1.00.0000" &&
            pes.machine[2].key == pes.machine[0].key && pes.machine[2].name == "code" &&
            pes.machine[2].from_file == "code.txt" && pes.machine[2].text.empty() && !pes.machine[2].dword);
+    // The processor keys wineboot would leave: PES's system check reads ~MHz.
+    assert(pes.machine[3].key == "Hardware\\Description\\System\\CentralProcessor\\0" &&
+           pes.machine[3].name == "~MHz" && pes.machine[3].dword && pes.machine[3].number == 3500 &&
+           pes.machine[4].name == "Identifier" && pes.machine[4].text == "AMD64 Family 23 Model 71 Stepping 0" &&
+           pes.machine[5].name == "VendorIdentifier" && pes.machine[5].text == "AuthenticAMD" &&
+           pes.machine[6].name == "ProcessorNameString" && pes.machine[6].text == "AMD 4700S 8-Core Processor" &&
+           pes.machine[7].key == pes.machine[3].key && pes.machine[7].name == "FeatureSet" &&
+           pes.machine[7].dword && pes.machine[7].number == 0x1FFF);
     std::string profile;
     assert(profile_text(pes.profile, profile, error));
 

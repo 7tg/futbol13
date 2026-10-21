@@ -1,0 +1,72 @@
+From 4ae7c282a6a5fe9d12c0c0f3d8a5c3013e306db2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Barbaros=20G=C3=B6ren?=
+ <20913374+7tg@users.noreply.github.com>
+Date: Wed, 21 Oct 2026 19:00:00 +0300
+Subject: [PATCH] ntdll: Report 8 GiB of physical memory on PS5.
+
+The PS5 build of Wine has no sysinfo, so virtual_get_system_info takes
+sysconf(_SC_PHYS_PAGES), and the console answers with the title's memory
+budget, about 1 GiB. Games compare that figure with their minimum
+requirement and refuse their settings (PES 2013: "RAM 1.0GB").
+
+wine/patches/0605 reports a fixed 8 GiB, half the console's memory, on
+__PROSPERO__. PUBLICATION_ALLOWLIST.txt lists it.
+---
+ PUBLICATION_ALLOWLIST.txt                     |  1 +
+ .../0605-ntdll-ps5-physical-memory-size.patch | 32 +++++++++++++++++++
+ 2 files changed, 33 insertions(+)
+ create mode 100644 wine/patches/0605-ntdll-ps5-physical-memory-size.patch
+
+diff --git a/PUBLICATION_ALLOWLIST.txt b/PUBLICATION_ALLOWLIST.txt
+index e25a352..4d7b3d5 100644
+--- a/PUBLICATION_ALLOWLIST.txt
++++ b/PUBLICATION_ALLOWLIST.txt
+@@ -218,6 +218,7 @@ wine/patches/0590-ntdll-ps5-repair-null-fs-on-unix-entry.patch
+ wine/patches/0600-ntdll-ps5-direct-memory-for-anonymous-memory.patch
+ wine/patches/0601-ntdll-ps5-keep-i386-images-below-4gib.patch
+ wine/patches/0602-ntdll-map-unaligned-shared-sections-private.patch
++wine/patches/0605-ntdll-ps5-physical-memory-size.patch
+ wine/patches/0610-ntdll-ps5-segv-hook-for-the-wow64-cpu.patch
+ wine/patches/0611-wow64-ps5-take-the-cpu-from-the-environment.patch
+ wine/patches/0620-ntdll-generic-processor-topology.patch
+diff --git a/wine/patches/0605-ntdll-ps5-physical-memory-size.patch b/wine/patches/0605-ntdll-ps5-physical-memory-size.patch
+new file mode 100644
+index 0000000..432e093
+--- /dev/null
++++ b/wine/patches/0605-ntdll-ps5-physical-memory-size.patch
+@@ -0,0 +1,32 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: prospero-win <prospero-win@invalid>
++Date: Wed, 21 Oct 2026 19:00:00 +0300
++Subject: [PATCH] ntdll: Report 8 GiB of physical memory on PS5.
++
++The PS5 reports the title's memory budget as the machine's physical
++memory (about 1 GiB), and games compare that figure with their minimum
++requirement. Report 8 GiB, half the console's memory.
++---
++ dlls/ntdll/unix/virtual.c | 7 ++++++-
++ 1 file changed, 6 insertions(+), 1 deletion(-)
++
++diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
++--- a/dlls/ntdll/unix/virtual.c
+++++ b/dlls/ntdll/unix/virtual.c
++@@ -4175,7 +4175,12 @@ UINT_PTR get_host_page_size(void)
++  */
++ void virtual_get_system_info( SYSTEM_BASIC_INFORMATION *info, BOOL wow64 )
++ {
++-#if defined(HAVE_SYSINFO) \
+++#if defined(__PROSPERO__)
+++    /* The PS5 reports the title's memory budget as the machine's physical
+++     * memory (about 1 GiB), and games compare that figure with their minimum
+++     * requirement. Report 8 GiB, half the console's memory. */
+++    info->MmHighestPhysicalPage = ((ULONG64)8 << 30) / page_size;
+++#elif defined(HAVE_SYSINFO) \
++     && defined(HAVE_STRUCT_SYSINFO_TOTALRAM) && defined(HAVE_STRUCT_SYSINFO_MEM_UNIT)
++     struct sysinfo sinfo;
++ 
++-- 
++2.56.0
++
+-- 
+2.56.0
+

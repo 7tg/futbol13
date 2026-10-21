@@ -33,10 +33,22 @@ def test_registry_is_what_the_games_installer_leaves(tmp_path):
     # player's code.txt in the game folder, never a code of ours.
     key = "Software\\Wow6432Node\\KONAMI\\PES2013"
     machine = plan(tmp_path)["registry"]["machine"]
-    assert [(v["key"], v["name"]) for v in machine] == [(key, "installdir"), (key, "version"), (key, "code")]
+    assert [(v["key"], v["name"]) for v in machine[:3]] == [(key, "installdir"), (key, "version"), (key, "code")]
     assert machine[0]["string"] == "C:\\Games\\PES2013\\" and machine[1]["string"] == "1.00.0000"
     code = machine[2]
     assert code["from_file"] == "code.txt" and "string" not in code and "dword" not in code
+
+def test_processor_keys_for_the_system_check(tmp_path):
+    # wineboot never runs on the console: the plan writes the processor keys PES reads.
+    cpu = "Hardware\\Description\\System\\CentralProcessor\\0"
+    machine = plan(tmp_path)["registry"]["machine"][3:]
+    assert machine == [
+        {"key": cpu, "name": "~MHz", "dword": 3500},
+        {"key": cpu, "name": "Identifier", "string": "AMD64 Family 23 Model 71 Stepping 0"},
+        {"key": cpu, "name": "VendorIdentifier", "string": "AuthenticAMD"},
+        {"key": cpu, "name": "ProcessorNameString", "string": "AMD 4700S 8-Core Processor"},
+        {"key": cpu, "name": "FeatureSet", "dword": 0x1FFF},
+    ]
 
 def test_our_dxvk_conf_is_the_only_text(tmp_path):
     p = plan(tmp_path)
