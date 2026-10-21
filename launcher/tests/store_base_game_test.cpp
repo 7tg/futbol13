@@ -176,14 +176,14 @@ int main()
         // An unversioned manifest: the entries are there, so the copy is ready, as it is.
         const auto *pes = manifest_for("PES2013");
         assert(pes && pes->unversioned && pes->releases.empty() && pes->mod_files.empty());
-        const auto folder = fs::temp_directory_path() / "pes-copy";
-        fs::remove_all(folder);
+        const auto folder = root / "pes-copy";
         put(folder / "PES2013.EXE", std::string(10, 'x'));
         put(folder / "IMG/dt00_e.img", std::string(1000, 'd'));
         put(folder / "rld.dll", "mod");          // anything else is simply part of the copy
         auto got = inspect(folder.string(), *pes);
         assert(got.state == State::ready && got.version.empty() && got.warning.empty());
         assert(got.detail.find("as it is") != std::string::npos);
+        assert(got.detail.find("(0 MB)") != std::string::npos); // 1013 bytes
         fs::remove_all(folder / "IMG");
         got = inspect(folder.string(), *pes);
         assert(got.state == State::incomplete && got.detail.find("img") != std::string::npos);

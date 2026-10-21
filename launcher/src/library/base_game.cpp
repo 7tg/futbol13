@@ -6,12 +6,11 @@
 #include "third_party/miniz/miniz.h"
 #include <cerrno>
 #include <cstdio>
-#include <filesystem>
 #include <cstring>
-#include <dirent.h>
 #include <map>
 #include <mutex>
 #include <tuple>
+#include <dirent.h>
 #include <fcntl.h>
 #include <strings.h>
 #include <sys/stat.h>
@@ -140,22 +139,34 @@ std::string join(const std::vector<std::string> &items)
 // The bytes in a folder's regular files, links not followed, unreadable parts skipped.
 std::uint64_t folder_bytes(const std::string &folder)
 {
-    namespace fs = std::filesystem;
+    DIR *directory = opendir(folder.c_str());
+    if (!directory)
+        return 0;
+    std::vector<std::string> names;
+    while (const dirent *entry = readdir(directory))
+        if (std::strcmp(entry->d_name, ".") != 0 && std::strcmp(entry->d_name, "..") != 0)
+            names.emplace_back(entry->d_name);
+    closedir(directory);
     std::uint64_t total = 0;
-    std::error_code error;
-    for (fs::recursive_directory_iterator it(folder, fs::directory_options::skip_permission_denied, error), end;
-         !error && it != end; it.increment(error))
-        if (std::error_code e; it->is_regular_file(e) && !it->is_symlink(e))
-            if (const auto size = it->file_size(e); !e)
-                total += size;
+    for (const auto &name : names)
+    {
+        const auto path = folder + "/" + name;
+        struct stat info{};
+        if (lstat(path.c_str(), &info) != 0)
+            continue;
+        if (S_ISREG(info.st_mode))
+            total += static_cast<std::uint64_t>(info.st_size);
+        else if (S_ISDIR(info.st_mode))
+            total += folder_bytes(path);
+    }
     return total;
 }
 
-// "5.7 GB" from a gigabyte up, "930 MB" below.
+// "5.7 GB" from what rounds to a gigabyte up, "930 MB" below.
 std::string size_text(std::uint64_t bytes)
 {
     char text[32];
-    if (bytes >= 1'000'000'000)
+    if (bytes >= 999'500'000) // 999.5 MB and up would print "1000 MB"
         std::snprintf(text, sizeof text, "%.1f GB", static_cast<double>(bytes) / 1e9);
     else
         std::snprintf(text, sizeof text, "%.0f MB", static_cast<double>(bytes) / 1e6);
