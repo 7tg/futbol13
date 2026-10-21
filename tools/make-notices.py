@@ -13,7 +13,7 @@ find their exact source, so this rewrites them, in place:
                   patches/<project>), then prospero-win's own lines as they were.
   THIRD_PARTY.md  what the app's own parts are and their licences (the launcher, game.bin, DXVK,
                   ps5-opengl, the bare prefix, the art), then prospero-win's text, which in this
-                  folder describes game.bin and PPSA99405 rather than eboot.bin and PPSA99995.
+                  folder describes game.bin and this app's title ID rather than eboot.bin and PPSA99995.
 
 Running it twice gives the same files: the FUTBOL13 part is replaced, never stacked.
 """

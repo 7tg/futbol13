@@ -16,17 +16,16 @@ source. The app downloads nothing. FUTBOL13 is not affiliated with Konami or Son
 
 - Installs PES 2013 from your folder into its Wine prefix, as it is. Your copy is never
   changed.
-- Takes your folder modded as you like. People add squad updates, commentary in their own
-  language and other patches on the PC; whatever is in the folder is installed. Nothing is
-  checked beyond `pes2013.exe` and `img/`, nothing is left out, and the only file added is
-  our `dxvk.conf`.
+- Takes your own copy's folder as you set it up on the PC, with the squad updates or
+  commentary in your language you added there; it is installed as it is. Only `pes2013.exe`
+  and `img/` must be there, and the only file added is our `dxvk.conf`.
 - Carries your saves and squads over from the PC, if you copy them (see below).
 - Writes the game's `settings.dat` itself, since PES's `settings.exe` has no place on the
   console: full screen, the highest quality, the pad as an XInput controller, and the
   resolution chosen on the page.
 - Starts the game straight from its tile. **Hold □ while the tile starts** to open
   FUTBOL13's page instead. The page has the resolution (3840×2160, 2560×1440 or 1920×1080),
-  a performance overlay (DXVK's HUD), Repair and Play.
+  a performance overlay (DXVK's HUD), Repair (△) and Play.
 - In the game, the touchpad moves the mouse pointer and pressing it clicks. To quit, hold
   Options and the touchpad together for about a second.
 - The DualSense rumbles when the game asks for it.
@@ -57,6 +56,10 @@ source. The app downloads nothing. FUTBOL13 is not affiliated with Konami or Son
    `Documents\KONAMI\Pro Evolution Soccer 2013\save\`. Copy that `save` folder to
    `/data/futbol13/saves/PES2013/save/` **before you install**. A squad update applied on the
    PC often lives there, not in the game folder, so this step is what carries it over.
+   The install only adds files the game doesn't have yet; it never changes the ones it has.
+   The game's own files are in
+   `/data/prospero-win/prefixes/futbol13/drive_c/users/<user>/Documents/KONAMI/Pro Evolution Soccer 2013/save/`;
+   to bring in newer squads later, remove the old files there over FTP, then repair.
 4. Open FUTBOL13 and press Install. It copies your game into the prefix, writes `dxvk.conf`
    and `settings.dat`, and places your save files where the game keeps its save, for each
    Windows user of the prefix, wherever the game has none. Nothing is downloaded.

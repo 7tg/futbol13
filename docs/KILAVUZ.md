@@ -16,13 +16,13 @@ bağlantısı yoktur.
 
 - PES 2013'ü kendi klasörünüzden, kendine ait bir Wine önekine (prefix) olduğu gibi kurar.
   Kopyanız hiçbir zaman değiştirilmez.
-- Klasörünüzü PC'de nasıl hazırladıysanız öyle alır. Oyuncular PC'de kadro güncellemesi,
-  Türkçe spiker ve başka yamalar ekler; klasörde ne varsa kurulur. `pes2013.exe` ve `img/`
-  dışında hiçbir şey denetlenmez, hiçbir şey dışarıda bırakılmaz; eklenen tek dosya bizim
-  `dxvk.conf` dosyamızdır.
+- Kendi kopyanızın klasörünü PC'de nasıl hazırladıysanız (kadro güncellemesi, Türkçe spiker
+  gibi eklemelerle) öyle kurar. Yalnızca `pes2013.exe` ve `img/` bulunmalıdır; eklenen tek
+  dosya bizim `dxvk.conf` dosyamızdır.
 - İsterseniz kayıtlarınızı ve kadrolarınızı PC'den taşır (aşağıya bakın).
 - PES'in `settings.exe` programı konsolda çalışmadığı için oyunun `settings.dat` dosyasını
-  kendisi yazar: tam ekran, en yüksek kalite, XInput kumanda ve sayfada seçilen çözünürlük.
+  kendisi yazar: tam ekran, en yüksek kalite, kumanda XInput olarak ve sayfada seçilen
+  çözünürlük.
 - Kutucuğa bastığınızda oyun doğrudan açılır.
 - **Yerel maç:** oturum açmış her PS5 kullanıcısı için bir kumanda.
 - Dokunmatik yüzey fare gibi çalışır.
@@ -64,7 +64,7 @@ güncellemesi çoğu zaman oyun klasöründe değil, bu klasörde durur; yani ya
 klasörünü kopyalarsanız yeni kadrolar konsola gelmez.
 
 Kadroyu ve kayıtlarınızı taşımak için **kurulumdan önce** bu `save` klasörünü FTP ile
-`/data/futbol13/saves/PES2013/save/` konumuna kopyalayın. Kurulum içindeki dosyaları, öneğin
+`/data/futbol13/saves/PES2013/save/` konumuna kopyalayın. Kurulum içindeki dosyaları, önekin
 her Windows kullanıcısı için oyunun kaydını tuttuğu yere, yalnızca orada oyunun kendi dosyası
 yoksa yerleştirir. Oyunun kendi kayıt dosyaları oluştuktan sonra kurulum ya da onarım bunları
 **asla** değiştirmez, yani ilerlemeniz kaybolmaz.
@@ -76,7 +76,7 @@ açılır:
 
 - **Çözünürlük:** 3840×2160, 2560×1440 veya 1920×1080
 - **Performans katmanı:** ekranda kare hızı ve kare süreleri (DXVK HUD)
-- **Onar:** kurulumu onarır; kayıtlarınıza dokunmaz
+- **Onar (△):** kurulumu onarır; kayıtlarınıza dokunmaz
 - **Oyna:** oyunu başlatır
 
 ## Kontroller
@@ -106,10 +106,12 @@ Dokunmatik yüzeyle fare kullanımı ve çıkış tuş kombinasyonu yalnızca bi
   açılmayan bir kopya burada da açılmaz. FUTBOL13 bir sonraki açılışta bunu söyler.
 - **Kurulum hata veriyor:** PES 2013 klasörünün `/data/futbol13/base-games/PES2013`
   konumunda olduğunu ve `pes2013.exe` dosyasını ve `img` klasörünü içerdiğini kontrol edin.
-  Sorun sürerse sayfadaki Onar ile onarın.
+  Sorun sürerse sayfadaki Onar (△) ile onarın.
 - **Yeni kadrolar oyunda yok:** kadro güncellemesi büyük olasılıkla PC'deki `save`
-  klasöründeydi. Yukarıdaki adımla kopyalayın. Oyunun kendi kayıt dosyaları zaten varsa
-  kurulum onları değiştirmez.
+  klasöründeydi. Yukarıdaki adımla kopyalayın. Kurulum yalnızca oyunda henüz olmayan
+  dosyaları ekler; var olanları değiştirmez. Oyunun kendi dosyaları
+  `/data/prospero-win/prefixes/futbol13/drive_c/users/<kullanıcı>/Documents/KONAMI/Pro Evolution Soccer 2013/save/`
+  konumundadır; onarımdan önce oradaki eski dosyaları FTP ile silebilirsiniz.
 - **İkinci kumanda görünmüyor:** o kumandayla bir kullanıcı ya da misafir olarak oturum
   açın.
 - **Çözünürlük değişmiyor:** ayarlar sayfasından seçin; FUTBOL13 bunu oyunun kendi
