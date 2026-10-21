@@ -574,10 +574,10 @@ int main(int argc, char **argv)
                 }
                 else if (mode == "mw-installing-files")
                 {
-                    // Further on: the game's files, the stages before it done.
+                    // Further on: the game's files, the stages before it done (no downloads or checks
+                    // for PES, so those lines stay empty).
                     screen.set_activity({"PPSA99405", 6, 1200u << 20, 3000u << 20, {}, 4,
-                                         {"On the console", "All 17 files ready", "Using the prefix pb-futbol13",
-                                          "Your copy and the mod files check out",
+                                         {"On the console", "", "Using the prefix futbol13", "",
                                           "Copying your game into the prefix"}, 0.72f});
                     settle(60);
                 }

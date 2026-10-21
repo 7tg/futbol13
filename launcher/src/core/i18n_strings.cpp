@@ -308,13 +308,10 @@ const Row kStrings[] = {
       "Kopyanız, modları ve ayarlarıyla. Önce her dosya denetlenir."}},
     {{"Your game copy is never changed. The old install stays until this one checks out.",
       "Oyun kopyanız hiç değiştirilmez. Bu kurulum sağlam çıkana kadar eskisi kalır."}},
-    {{"Your own copy of PES 2013, with the mods you installed on the PC. FUTBOL13 copies it as "
-      "it is.",
-      "PC'de kurduğunuz modlarla birlikte kendi PES 2013 kopyanız. FUTBOL13 onu olduğu gibi "
-      "kopyalar."}},
+    {{"Your own copy of PES 2013, mods and all, as it is.",
+      "Kendi PES 2013 kopyanız, modlarıyla, olduğu gibi."}},
     {{"Your saves and your copy of the game stay. Install puts it back.",
       "Kayıtlarınız ve oyun kopyanız kalır. Yükle onu geri getirir."}},
-    // The plan's option titles and descriptions (assets/plans/BLUR.json), by their English.
 };
 
 const std::size_t kStringCount = sizeof(kStrings) / sizeof(kStrings[0]);

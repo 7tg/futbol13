@@ -69,7 +69,8 @@ struct IniEdit
 // before the desktop's size). Only a file that is already there is changed, and only the
 // values of the attributes (one missing from the element is added after the others); every
 // other byte stays. A file without the element is left alone. In a value, {width} and
-// {height} are the profile's picture size.
+// {height} are the profile's picture size. PES keeps its settings in a binary file and uses
+// user_binaries (below) instead.
 //   "user_files": [{"file": "AppData/Roaming/...", "element": "shared_graphical_settings",
 //                   "attributes": {"width": "{width}", "height": "{height}"}}]
 struct UserFile

@@ -2668,8 +2668,7 @@ Screen::Offer Screen::offer(const App &app) const
                 out.note = trs("Follow the steps on the left");
             }
             out.reason = base.state == State::absent
-                             ? trs("Your own copy of PES 2013, with the mods you installed on "
-                                   "the PC. FUTBOL13 copies it as it is.")
+                             ? trs("Your own copy of PES 2013, mods and all, as it is.")
                              : base.path;
         }
         return out;
