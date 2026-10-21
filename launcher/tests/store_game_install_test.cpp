@@ -113,6 +113,11 @@ int main()
            pes.user_binaries[0].file == "Documents/KONAMI/Pro Evolution Soccer 2013/settings.dat" &&
            pes.user_binaries[0].bytes.size() == 852 && pes.user_binaries[0].fields.size() == 2 &&
            pes.user_binaries[0].has_checksum && pes.user_binaries[0].checksum_at == 12);
+    // The key the game's installer leaves and pes2013.exe looks for at start.
+    assert(pes.machine.size() == 2 && pes.user.empty() &&
+           pes.machine[0].key == "Software\\Wow6432Node\\KONAMI\\PES2013" &&
+           pes.machine[0].name == "installdir" && pes.machine[0].text == "C:\\Games\\PES2013\\" &&
+           pes.machine[1].name == "version" && pes.machine[1].text == "1.00.0000");
     std::string profile;
     assert(profile_text(pes.profile, profile, error));
 

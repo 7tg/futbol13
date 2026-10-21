@@ -13,6 +13,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 OUT = ROOT / "launcher/assets/plans/PES2013.json"
 SAVE = "Documents/KONAMI/Pro Evolution Soccer 2013"
+KEY = "Software\\Wow6432Node\\KONAMI\\PES2013"  # the 32-bit game's HKLM\Software\KONAMI\PES2013
 
 spec = importlib.util.spec_from_file_location("settings_dat", HERE / "settings_dat.py")
 settings_dat = importlib.util.module_from_spec(spec)
@@ -39,7 +40,14 @@ def plan():
         "ini": [],
         "texts": [{"to": "dxvk.conf", "body": text("dxvk.conf")}],
         "expect": {},
-        "registry": {"machine": [], "user": []},
+        # What the game's own installer leaves in the registry: pes2013.exe reads installdir at
+        # start, looks for img/dt00_*.img and dt05_*.img there, then reads "code", the player's
+        # CD key; with either missing it says "Pro Evolution Soccer 2013 has not been
+        # installed". The key is not in the game folder, so the plan can't write it.
+        "registry": {"machine": [
+            {"key": KEY, "name": "installdir", "string": "C:\\Games\\PES2013\\"},
+            {"key": KEY, "name": "version", "string": "1.00.0000"},
+        ], "user": []},
         "user_files": [],
         # The player's save folder from /data/futbol13/saves/PES2013/save (options, edited
         # squads, the EDIT file a squad update gives): copied where the game has none yet.

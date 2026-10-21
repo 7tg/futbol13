@@ -19,7 +19,18 @@
  ],
  "expect": {},
  "registry": {
-  "machine": [],
+  "machine": [
+   {
+    "key": "Software\\Wow6432Node\\KONAMI\\PES2013",
+    "name": "installdir",
+    "string": "C:\\Games\\PES2013\\"
+   },
+   {
+    "key": "Software\\Wow6432Node\\KONAMI\\PES2013",
+    "name": "version",
+    "string": "1.00.0000"
+   }
+  ],
   "user": []
  },
  "user_files": [],
