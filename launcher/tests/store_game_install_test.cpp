@@ -114,7 +114,7 @@ int main()
            pes.user_binaries[0].bytes.size() == 852 && pes.user_binaries[0].fields.size() == 2 &&
            pes.user_binaries[0].has_checksum && pes.user_binaries[0].checksum_at == 12);
     // The key the game's installer leaves and pes2013.exe looks for at start.
-    assert(pes.machine.size() == 8 && pes.user.empty() &&
+    assert(pes.machine.size() == 8 &&
            pes.machine[0].key == "Software\\Wow6432Node\\KONAMI\\PES2013" &&
            pes.machine[0].name == "installdir" && pes.machine[0].text == "C:\\Games\\PES2013\\" &&
            pes.machine[1].name == "version" && pes.machine[1].text == "1.00.0000" &&
@@ -128,6 +128,11 @@ int main()
            pes.machine[6].name == "ProcessorNameString" && pes.machine[6].text == "AMD 4700S 8-Core Processor" &&
            pes.machine[7].key == pes.machine[3].key && pes.machine[7].name == "FeatureSet" &&
            pes.machine[7].dword && pes.machine[7].number == 0x1FFF);
+    // The video memory PES reads through Wine's ddraw, whose adapter on the PS5 has no 3D.
+    assert(pes.user.size() == 2 && pes.user[0].key == "Software\\Wine\\Direct3D" &&
+           pes.user[0].name == "VideoMemorySize" && pes.user[0].text == "2048" && !pes.user[0].dword &&
+           pes.user[1].key == pes.user[0].key && pes.user[1].name == "renderer" &&
+           pes.user[1].text == "no3d" && !pes.user[1].dword);
     std::string profile;
     assert(profile_text(pes.profile, profile, error));
 
