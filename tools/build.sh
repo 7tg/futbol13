@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Build Sahin, the same way on any machine: prospero-win (the Wine runtime and Blur's runner),
-# our DXVK, the bare prefix, the launcher's bundle and the app, PPSA99404.
+# Build FUTBOL13, the same way on any machine: prospero-win (the Wine runtime and the game's runner),
+# our DXVK, the bare prefix, the launcher's bundle and the app, PPSA99405.
 #
 #   tools/build.sh [--clean] [STEP...]
 #
@@ -14,20 +14,20 @@
 # STEPs, in order:
 #   setup title radv zink hostwine wineps5 cpu pkg apps dxvk prefix
 #             tools/build-prospero-win.sh's steps
-#   plan      profile/blur/make-blur-plan.py; fails if the committed
-#             launcher/assets/plans/BLUR.json differs from what it writes
+#   plan      profile/pes2013/make-pes2013-plan.py; fails if the committed
+#             launcher/assets/plans/PES2013.json differs from what it writes
 #   bundle    tools/make-bundle.py: the bare prefix into the launcher's assets/bundle
 #   opengl-sdk  tools/build-opengl-sdk.sh: the launcher's ps5-opengl SDK, from the ps5-opengl
 #             submodule -> release/ps5-opengl-sdk-<version>.tar.gz (its release download
 #             is gone; launcher/tools/fetch-opengl-sdk.sh pins this build's hashes)
 #   game-app  the app: the launcher as eboot.bin, the runner (apps step) as game.bin
-#             -> release/PPSA99404/ and release/PPSA99404.zip
-#   audit     tools/audit.py over the committed tree and release/PPSA99404 (the PE files
+#             -> release/PPSA99405/ and release/PPSA99405.zip
+#   audit     tools/audit.py over the committed tree and release/PPSA99405 (the PE files
 #             built from source are listed in tools/app.audit-allow)
-# Default: all. --clean starts from an empty volume (SAHIN_VOLUME names it; default sahin-work).
+# Default: all. --clean starts from an empty volume (FUTBOL13_VOLUME names it; default futbol13-work).
 set -euo pipefail
 here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-image=sahin-build volume=${SAHIN_VOLUME:-sahin-work}
+image=futbol13-build volume=${FUTBOL13_VOLUME:-futbol13-work}
 pw_steps="setup title radv zink hostwine wineps5 cpu pkg apps dxvk prefix"
 all="$pw_steps plan bundle opengl-sdk game-app audit"
 clean=0
@@ -49,14 +49,14 @@ git -C "$here" diff --quiet HEAD -- . ':!PS5_Mesa' ':!PS5_Vulkan' ':!prospero-wi
 # The image is built once per Dockerfile: it carries the Dockerfile's git hash as a label, so an
 # image built here before, or copied in (docker save | docker load), is used as it is.
 recipe=$(git -C "$here" hash-object tools/container/Dockerfile)
-[[ $(docker image inspect -f '{{index .Config.Labels "sahin.dockerfile"}}' "$image" 2>/dev/null) == "$recipe" ]] ||
-    docker build -q --platform linux/amd64 --label "sahin.dockerfile=$recipe" -t "$image" "$here/tools/container" >/dev/null
+[[ $(docker image inspect -f '{{index .Config.Labels "futbol13.dockerfile"}}' "$image" 2>/dev/null) == "$recipe" ]] ||
+    docker build -q --platform linux/amd64 --label "futbol13.dockerfile=$recipe" -t "$image" "$here/tools/container" >/dev/null
 (( clean )) && docker volume rm -f "$volume" >/dev/null
 docker volume create "$volume" >/dev/null
 mkdir -p "$here/release"
 
 pw=; for s in $steps; do [[ " $pw_steps " == *" $s "* ]] && pw+=" $s"; done
-docker run --rm --platform linux/amd64 -v "$volume:/w" -v "$here:/src/sahin:ro" -v "$here/release:/out" \
+docker run --rm --platform linux/amd64 -v "$volume:/w" -v "$here:/src/futbol13:ro" -v "$here/release:/out" \
     -e REV="$(git -C "$here" rev-parse HEAD)" -e OWNER="$(id -u):$(id -g)" \
     "$image" bash -euo pipefail -c "
 want() { [[ '$steps' == *\" \$1 \"* ]]; }
@@ -65,8 +65,8 @@ checkout() { # source dir commit
     git -C \"\$2\" fetch -q \"\$1\" \"\$3\"
     git -C \"\$2\" checkout -q --force --detach \"\$3\"
 }
-checkout /src/sahin /w/sahin \"\$REV\"
-cd /w/sahin
+checkout /src/futbol13 /w/futbol13 \"\$REV\"
+cd /w/futbol13
 # The submodules, from the working copy's own clones: each cloned once at its gitlink commit
 # (again only when that commit is new to it); the setup step makes its patched branch. Not
 # checked out again otherwise: that would leave prospero-win, PS5_Mesa and PS5_Vulkan on their
@@ -74,17 +74,17 @@ cd /w/sahin
 for sub in prospero-win PS5_Mesa PS5_Vulkan PS5_PayloadSDK ps5-native-app-boilerplate ps5-opengl; do
     sha=\$(git ls-tree HEAD \$sub | awk '{print \$3}')
     [[ -d \$sub/.git ]] && git -C \$sub cat-file -e \"\$sha^{commit}\" 2>/dev/null && continue
-    checkout /src/sahin/\$sub /w/sahin/\$sub \$sha
+    checkout /src/futbol13/\$sub /w/futbol13/\$sub \$sha
 done
 
 if [[ -n '$pw' ]]; then tools/build-prospero-win.sh $pw; fi
 
-L=/w/sahin/launcher A=release/PPSA99404
+L=/w/futbol13/launcher A=release/PPSA99405
 if want plan; then
     echo '==> plan'
-    python3 profile/blur/make-blur-plan.py
-    git diff --exit-code -- launcher/assets/plans/BLUR.json ||
-        { echo 'make-blur-plan.py writes another plan than the committed launcher/assets/plans/BLUR.json' >&2; exit 1; }
+    python3 profile/pes2013/make-pes2013-plan.py
+    git diff --exit-code -- launcher/assets/plans/PES2013.json ||
+        { echo 'make-pes2013-plan.py writes another plan than the committed launcher/assets/plans/PES2013.json' >&2; exit 1; }
 fi
 if want bundle; then
     echo '==> bundle'
@@ -98,7 +98,7 @@ if want opengl-sdk; then
     tools/build-opengl-sdk.sh \$L/.deps/native/ps5-payload-sdk release
 fi
 if want game-app; then
-    # The launcher (GNUmakefile GAME=PPSA99404) as eboot.bin, prospero-win's runner (the apps
+    # The launcher (GNUmakefile GAME=PPSA99405) as eboot.bin, prospero-win's runner (the apps
     # step) as game.bin, with the bundle.
     echo '==> game-app'
     # The launcher's pinned ps5-opengl SDK, from the opengl-sdk step: launcher/tools/
@@ -106,10 +106,10 @@ if want game-app; then
     sdk=\$(cd release && ls ps5-opengl-sdk-*.tar.gz 2>/dev/null || true)
     [[ -n \$sdk && -f release/\$sdk ]] || { echo 'no release/ps5-opengl-sdk-*.tar.gz: run the opengl-sdk step' >&2; exit 2; }
     mkdir -p \$L/.deps/ps5-opengl && cp release/\$sdk \$L/.deps/ps5-opengl/
-    make -C \$L USE_CCACHE=0 GAME=PPSA99404 app
-    D=\$L/dist/PPSA99404
+    make -C \$L USE_CCACHE=0 GAME=PPSA99405 app
+    D=\$L/dist/PPSA99405
     rm -rf \$D/assets/bundle && cp -a \$L/assets/bundle \$D/assets/bundle
-    rm -rf \$A release/PPSA99404.zip && cp -a release/apps/PPSA99404 \$A
+    rm -rf \$A release/PPSA99405.zip && cp -a release/apps/PPSA99405 \$A
     mv \$A/eboot.bin \$A/game.bin
     cp \$D/eboot.bin \$D/store-worker.elf \$D/lapy.elf \$D/lapy-manifest.json \$A/
     # The launcher's licences go in with the runner's: a separate licenses/ beside LICENSES/
@@ -138,7 +138,7 @@ if want game-app; then
     # SOURCES.txt and THIRD_PARTY.md, which prospero-win's packager wrote for its own package:
     # made to name this commit, the launcher and our DXVK, and to describe this folder.
     python3 tools/make-notices.py \$A \$REV
-    python3 tools/make-app-zip.py \$A release/PPSA99404.zip
+    python3 tools/make-app-zip.py \$A release/PPSA99405.zip
 fi
 if want audit; then
     echo '==> audit'
@@ -152,7 +152,7 @@ if want audit; then
 fi
 
 # The outputs, and their hashes.
-out='PPSA99995 apps PPSA99404 PPSA99404.zip bare-prefix-sahin.zip '\$(cd release && ls ps5-opengl-sdk-*.tar.gz 2>/dev/null || true)
+out='PPSA99995 apps PPSA99405 PPSA99405.zip bare-prefix-futbol13.zip '\$(cd release && ls ps5-opengl-sdk-*.tar.gz 2>/dev/null || true)
 # Only what the volume has replaces release/: an output it lacks (a partial run on a fresh
 # volume) is left as it was, and hashed with the rest.
 for o in \$out; do [[ ! -e release/\$o ]] || { rm -rf /out/\$o; cp -a release/\$o /out/; }; done

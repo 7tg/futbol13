@@ -65,7 +65,7 @@ cp -a "$src/LICENSE" "$src/LICENSES" "$src/THIRD_PARTY_NOTICES.md" "$stage/$name
 cp "$src/third_party/SPIRV-Headers/LICENSE" "$stage/$name/LICENSES/SPIRV-Headers.txt"
 cp "$src/third_party/Vulkan-Headers/LICENSE.md" "$stage/$name/LICENSES/Vulkan-Headers.txt"
 {
-    printf 'ps5-opengl SDK %s, built from source by Sahin (tools/build-opengl-sdk.sh)\n\n' "$version"
+    printf 'ps5-opengl SDK %s, built from source by FUTBOL13 (tools/build-opengl-sdk.sh)\n\n' "$version"
     printf 'source: https://github.com/mpereiraesaa/ps5-opengl commit %s\n' "$commit"
     printf 'build: make sdk-gl46, display profile dynamic (PS5_SCANOUT_HEIGHT=2160 PS5_SCANOUT_FPS=120 PS5_DYNAMIC_SCANOUT=1)\n'
     printf 'flags: PS5_GPU_PRESENT_BATCH=1 PS5_DRAW_PROFILE=1 PS5_MULTIDRAW_BATCH=1 PS5_DEFERRED_DRAW_BATCH=1\n'
