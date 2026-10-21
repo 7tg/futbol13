@@ -23,3 +23,6 @@ __pycache__/
 
 # A product code (code.txt in a game folder) is the player's own and never goes in the repo.
 code.txt
+
+# Private working notes (what was done and how), kept out of the repo.
+/docs/notes/
