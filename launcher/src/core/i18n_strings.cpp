@@ -31,10 +31,10 @@ const Row kStrings[] = {
       "Bakılacak {0} şey var: Options'a basıp Hakkında'yı açın."}},
     {{"{0} uninstalled", "{0} kaldırıldı"}},
     {{"{0} updated", "{0} güncellendi"}},
-    {{"1. Install PES 2013, the PC game, on a computer. Add the squad updates, commentary and "
-      "other patches you want there.",
-      "1. PES 2013'ü, PC oyununu, bir bilgisayara kurun. İstediğiniz kadro güncellemesini, "
-      "spikeri ve diğer yamaları orada ekleyin."}},
+    {{"1. Install PES 2013, the PC game, on a computer. Add the squad updates and commentary "
+      "you want there.",
+      "1. PES 2013'ü, PC oyununu, bir bilgisayara kurun. İstediğiniz kadro güncellemesini ve "
+      "spikeri orada ekleyin."}},
     {{"2. Copy the whole game folder, the one with pes2013.exe and img, to the PS5: over FTP to "
       "/data/futbol13/base-games/PES2013 (any case works), or to a USB drive as a folder named "
       "PES2013 at its top.",

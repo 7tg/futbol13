@@ -674,8 +674,8 @@ void Screen::refresh_detail()
         else
         {
             blocks.push_back(Block::paragraph(
-                trs("1. Install PES 2013, the PC game, on a computer. Add the squad updates, "
-                    "commentary and other patches you want there.")));
+                trs("1. Install PES 2013, the PC game, on a computer. Add the squad updates and "
+                    "commentary you want there.")));
             blocks.push_back(Block::paragraph(
                 trs("2. Copy the whole game folder, the one with pes2013.exe and img, to the PS5: "
                     "over FTP to /data/futbol13/base-games/PES2013 (any case works), or to a USB "
