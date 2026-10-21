@@ -44,6 +44,10 @@ class Font
     // text, or its longest prefix plus an ellipsis that fits max_width.
     std::string fit(std::string_view text, float size, float max_width,
                     float tracking = 0.0f) const;
+    // The largest size, from size down in whole pixels to min_size, at which text fits
+    // max_width; min_size when none does (then fit() at that size cuts it).
+    float fit_size(std::string_view text, float size, float min_size, float max_width,
+                   float tracking = 0.0f) const;
     float ascent(float size) const
     {
         return header_.ascent * size / header_.pixel_size;

@@ -2893,8 +2893,10 @@ void Screen::draw_action_box(const ui::Fonts &fonts, std::uint32_t glass, const 
             list.line(cx - 17.0f, cy + 6.0f * up, cx, cy + 24.0f * up, 5.0f, ink);
             list.line(cx + 17.0f, cy + 6.0f * up, cx, cy + 24.0f * up, 5.0f, ink);
         }
-        ui::text(list, fonts.display, fonts.display.font->fit(state.headline, 46, w), cx,
-                 box.y + 322.0f, 46, tone, gfx::Align::center);
+        // The headline shrinks before it is cut: "Waiting for your copy" is wider than the box at 46.
+        const float headline = fonts.display.font->fit_size(state.headline, 46, 34, w);
+        ui::text(list, fonts.display, fonts.display.font->fit(state.headline, headline, w), cx,
+                 box.y + 322.0f, headline, tone, gfx::Align::center);
         ui::text(list, fonts.regular, fonts.regular.font->fit(state.note, 21, w), cx,
                  box.y + 362.0f, 21, kInk.with_alpha(0.66f), gfx::Align::center);
         // Where it goes, and the room there; or where it is.
@@ -3108,8 +3110,9 @@ void Screen::draw_single_setup(const ui::Fonts &fonts, gfx::DrawList &list, cons
 {
     const float x = box.x + 34.0f, w = box.w - 68.0f, cx = box.cx();
     const Color tone = state.tone == 1 ? kAccent : state.tone == 2 ? kOwned : kInk;
-    ui::text(list, fonts.display, fonts.display.font->fit(state.headline, 44, w), cx, box.y + 100.0f,
-             44, tone, gfx::Align::center);
+    const float headline = fonts.display.font->fit_size(state.headline, 44, 32, w);
+    ui::text(list, fonts.display, fonts.display.font->fit(state.headline, headline, w), cx,
+             box.y + 100.0f, headline, tone, gfx::Align::center);
     ui::text(list, fonts.regular, fonts.regular.font->fit(state.note, 20, w), cx, box.y + 138.0f, 20,
              kInk.with_alpha(0.66f), gfx::Align::center);
     // The choices, each a row of segments; the D-pad's row is lit.

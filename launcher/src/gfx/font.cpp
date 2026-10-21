@@ -151,6 +151,15 @@ std::string Font::fit(std::string_view text, float size, float max_width, float 
     return best;
 }
 
+float Font::fit_size(std::string_view text, float size, float min_size, float max_width,
+                     float tracking) const
+{
+    for (float at = size; at > min_size; at -= 1.0f)
+        if (measure(text, at, tracking) <= max_width)
+            return at;
+    return min_size;
+}
+
 float Font::measure(std::string_view text, float size, float tracking) const
 {
     const float scale = size / header_.pixel_size;
