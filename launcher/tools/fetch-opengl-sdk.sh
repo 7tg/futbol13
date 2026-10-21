@@ -10,7 +10,8 @@
 # gone, so the SDK is built from source: the repository's ps5-opengl submodule (the fork
 # github.com/mpereiraesaa/ps5-opengl) at `commit`, by tools/build-opengl-sdk.sh (the
 # opengl-sdk step of tools/build.sh), which reads the version and commit from here. The build
-# is reproducible, so the hashes below are its output's. The archive is taken from
+# is reproducible, so the hashes below are its output's: built at /w/futbol13, the path its
+# static libraries hold (Sahin's hashes are for /w/sahin). The archive is taken from
 # .deps/ps5-opengl/ or PS5_OPENGL_ARCHIVE; nothing is downloaded.
 
 set -euo pipefail
@@ -18,8 +19,8 @@ set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 version=0.6.0-31-gb696cd3
 commit=b696cd39d63a4e346da3c680a31238b41ae359a8
-archive_sha256=659776cf824da758d048de6339101fb7002f3abc70efddc5ad2f85ea09ce5c40
-manifest_sha256=22acd4607ec796381fe7e1bf93b858c5f276caab53bcc9146d1091f2da5256e3
+archive_sha256=51450cb58f99086fbbe7db3c4c52cc9c5ed89728c508ff0b2676dd23df8db2c7
+manifest_sha256=bb77990ca0fcba16d27c208c1814ab8e459578b60170ffb9b3f657678b0f8e91
 
 cache="$root/.deps/ps5-opengl"
 archive="$cache/ps5-opengl-sdk-$version.tar.gz"
