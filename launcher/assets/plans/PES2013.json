@@ -61,7 +61,18 @@
     "dword": 8191
    }
   ],
-  "user": []
+  "user": [
+   {
+    "key": "Software\\Wine\\Direct3D",
+    "name": "VideoMemorySize",
+    "string": "2048"
+   },
+   {
+    "key": "Software\\Wine\\Direct3D",
+    "name": "renderer",
+    "string": "no3d"
+   }
+  ]
  },
  "user_files": [],
  "user_seeds": [

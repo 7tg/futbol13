@@ -69,7 +69,7 @@ source. The app downloads nothing. FUTBOL13 is not affiliated with Konami or Son
    `/data/prospero-win/prefixes/futbol13/drive_c/users/<user>/Documents/KONAMI/Pro Evolution Soccer 2013/save/`;
    to bring in newer squads later, remove the old files there over FTP, then repair.
 5. Open FUTBOL13 and press Install. It copies your game into the prefix, writes `dxvk.conf`
-   and `settings.dat`, writes your product code into the prefix's registry, and places your save files where the game keeps its save, for each
+   and `settings.dat`, writes your product code and the system values PES's start-up check reads into the prefix's registry, and places your save files where the game keeps its save, for each
    Windows user of the prefix, wherever the game has none. Nothing is downloaded.
 
 Once the game has save files of its own, install and repair never replace them.

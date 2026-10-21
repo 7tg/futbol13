@@ -69,16 +69,20 @@ rm -rf "$documents/KONAMI"
 cp -a "$from" "$documents/KONAMI"
 
 # The game's registry key (KONAMI\PES2013: installdir, version and code, the product code the
-# install read from code.txt in the game folder), as the install wrote it into the installed
-# prefix. The values go through wine reg and are never printed.
-key='Software\Wow6432Node\KONAMI\PES2013'
-SECTION="[${key//\\/\\\\}]" awk 'index($0, ENVIRON["SECTION"]) == 1 { on = 1; next }
-    on && /^$/ { exit }
-    on && /^"[^"]*"="/ { print }' "$installed/system.reg" |
-    sed 's/^"\([^"]*\)"="\(.*\)"$/\1\t\2/; s/\\\\/\\/g' |
-    while IFS=$'\t' read -r name value; do
-        WINEDEBUG=-all "$WINE" reg add "HKLM\\$key" /v "$name" /t REG_SZ /d "$value" /f >/dev/null
-    done
+# install read from code.txt in the game folder), and the user's Wine\Direct3D (the video memory
+# DirectDraw reports), as the install wrote them into the installed prefix. The values go through
+# wine reg and are never printed.
+copy_key() {  # hive (HKLM/HKCU), its file in the installed prefix, key: the key's string values
+    SECTION="[${3//\\/\\\\}]" awk 'index($0, ENVIRON["SECTION"]) == 1 { on = 1; next }
+        on && /^$/ { exit }
+        on && /^"[^"]*"="/ { print }' "$installed/$2" |
+        sed 's/^"\([^"]*\)"="\(.*\)"$/\1\t\2/; s/\\\\/\\/g' |
+        while IFS=$'\t' read -r name value; do
+            WINEDEBUG=-all "$WINE" reg add "$1\\$3" /v "$name" /t REG_SZ /d "$value" /f >/dev/null
+        done
+}
+copy_key HKLM system.reg 'Software\Wow6432Node\KONAMI\PES2013'
+copy_key HKCU user.reg 'Software\Wine\Direct3D'
 wineserver -w
 
 # The profile's overrides (PES2013.json: dll_overrides): DXVK's d3d9/dxgi, dinput8 native first.

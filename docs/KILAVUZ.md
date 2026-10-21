@@ -58,7 +58,7 @@ bağlantısı yoktur.
 5. İsterseniz kayıt klasörünüzü de kopyalayın (aşağıya bakın). Bunu **kurulumdan önce**
    yapın.
 6. FUTBOL13'ü açın ve **Yükle**'ye basın. FUTBOL13 oyununuzu öneke kopyalar, `dxvk.conf` ve
-   `settings.dat` dosyalarını yazar, ürün kodunuzu önekin kayıt defterine yazar ve kayıt
+   `settings.dat` dosyalarını yazar, ürün kodunuzu ve PES'in açılıştaki sistem denetiminin okuduğu değerleri önekin kayıt defterine yazar ve kayıt
    dosyalarınızı yerleştirir. Hiçbir şey
    indirilmez.
 

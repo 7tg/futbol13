@@ -26,7 +26,7 @@ def test_nothing_downloaded_nothing_added_nothing_stripped(tmp_path):
     assert p["sources"] == {} and p["game_files"] == [] and p["system_files"] == []
     assert p["strip"] == [] and p["options"] == [] and p["pending"] == [] and p["upgrades"] == []
     assert p["patches"] == [] and p["ini"] == [] and p["expect"] == {}
-    assert p["registry"]["user"] == [] and p["user_files"] == []
+    assert p["user_files"] == []
 
 def test_registry_is_what_the_games_installer_leaves(tmp_path):
     # installdir and version as the PC installer writes them; the product code from the
@@ -48,6 +48,14 @@ def test_processor_keys_for_the_system_check(tmp_path):
         {"key": cpu, "name": "VendorIdentifier", "string": "AuthenticAMD"},
         {"key": cpu, "name": "ProcessorNameString", "string": "AMD 4700S 8-Core Processor"},
         {"key": cpu, "name": "FeatureSet", "dword": 0x1FFF},
+    ]
+
+def test_video_memory_for_the_system_check(tmp_path):
+    # PES reads VRAM through Wine's ddraw, which on the console has only wined3d's no-3D adapter.
+    d3d = "Software\\Wine\\Direct3D"
+    assert plan(tmp_path)["registry"]["user"] == [
+        {"key": d3d, "name": "VideoMemorySize", "string": "2048"},
+        {"key": d3d, "name": "renderer", "string": "no3d"},
     ]
 
 def test_our_dxvk_conf_is_the_only_text(tmp_path):

@@ -15,6 +15,7 @@ OUT = ROOT / "launcher/assets/plans/PES2013.json"
 SAVE = "Documents/KONAMI/Pro Evolution Soccer 2013"
 KEY = "Software\\Wow6432Node\\KONAMI\\PES2013"  # the 32-bit game's HKLM\Software\KONAMI\PES2013
 CPU = "Hardware\\Description\\System\\CentralProcessor\\0"  # under HKLM, not redirected for a 32-bit game
+D3D = "Software\\Wine\\Direct3D"  # under HKCU: Wine's wined3d settings
 
 spec = importlib.util.spec_from_file_location("settings_dat", HERE / "settings_dat.py")
 settings_dat = importlib.util.module_from_spec(spec)
@@ -59,7 +60,14 @@ def plan():
             {"key": CPU, "name": "VendorIdentifier", "string": "AuthenticAMD"},
             {"key": CPU, "name": "ProcessorNameString", "string": "AMD 4700S 8-Core Processor"},
             {"key": CPU, "name": "FeatureSet", "dword": 0x1FFF},
-        ], "user": []},
+        ], "user": [
+            # PES reads the video memory for its check through DirectDraw, which is Wine's own
+            # ddraw on wined3d (DXVK only draws). The console has no OpenGL, so ddraw falls back
+            # to wined3d's no-3D adapter and its 128 MB, less the screen: under PES's 128 MB.
+            # 2048 MB stays below 2^31 however the game reads the DWORD; no3d skips the GL probe.
+            {"key": D3D, "name": "VideoMemorySize", "string": "2048"},
+            {"key": D3D, "name": "renderer", "string": "no3d"},
+        ]},
         "user_files": [],
         # The player's save folder from /data/futbol13/saves/PES2013/save (options, edited
         # squads, the EDIT file a squad update gives): copied where the game has none yet.
