@@ -563,6 +563,57 @@ int main()
         put(installed / "CODE.TXT", "\xEF\xBB\xBF" "WXYZ-5678\n");
         assert(apply_registry(coded, paths, options.now, error));
         assert(code_in_registry() == "WXYZ-5678");
+        // Notepad's "Unicode" (UTF-16 LE with a byte order mark) encodes to ASCII bytes.
+        {
+            std::string body{'\xFF', '\xFE'};
+            for (char c : std::string("UTFL-1111"))
+            {
+                body.push_back(c);
+                body.push_back('\0');
+            }
+            body.push_back('\n');
+            body.push_back('\0');
+            put(installed / "CODE.TXT", body);
+        }
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "UTFL-1111");
+        // UTF-16 BE with a byte order mark too.
+        {
+            std::string body{'\xFE', '\xFF'};
+            for (char c : std::string("UTFB-2222"))
+            {
+                body.push_back('\0');
+                body.push_back(c);
+            }
+            body.push_back('\0');
+            body.push_back('\n');
+            put(installed / "CODE.TXT", body);
+        }
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "UTFB-2222");
+        // A non-breaking space pasted around the code (Latin-1 0xA0) is trimmed with the blanks.
+        put(installed / "CODE.TXT", std::string("\xA0 NBSP-3333 \xA0\n"));
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "NBSP-3333");
+        // The same in UTF-8 (0xC2 0xA0), and the UTF-8 zero-width space (0xE2 0x80 0x8B).
+        put(installed / "CODE.TXT", std::string("\xC2\xA0UTF8-4444\xC2\xA0\n"));
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "UTF8-4444");
+        put(installed / "CODE.TXT", std::string("\xE2\x80\x8B" "ZWSP-5555" "\xE2\x80\x8B" "\n"));
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "ZWSP-5555");
+        // A character the registry won't take, inside the code: the error names the file and
+        // tells the player what to do about it. The file's bytes are not in the error.
+        const std::string not_ascii = "code.txt in your game folder has a character that can't "
+                                      "be used. Open it in Notepad, type the code yourself, and "
+                                      "save it as ANSI.";
+        put(installed / "CODE.TXT", std::string("ABCD\xA0-1234\n"));
+        assert(!apply_registry(coded, paths, options.now, error) && error == not_ascii &&
+               error.find("\xA0") == std::string::npos);
+        put(installed / "CODE.TXT", std::string("ABCD\xC2\xA0-1234\n"));
+        assert(!apply_registry(coded, paths, options.now, error) && error == not_ascii);
+        // The old registry-level "Can't set …" message is never shown for a from_file value now.
+        assert(error.find("Can't set") == std::string::npos);
         // The other values are written too, the file's text nowhere but its value.
         assert(read(prefix / "system.reg").find("\"Install Dir\"=\"C:\\\\Games\\\\GAME\\\\\"") !=
                std::string::npos);

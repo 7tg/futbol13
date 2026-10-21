@@ -71,13 +71,16 @@ std::string find_entry(const std::string &folder, const std::string &relative);
 enum class FileValue
 {
     found,
-    missing, // no such file (or it can't be read)
-    empty,   // nothing but blanks
-    too_long // over 4 KiB
+    missing,  // no such file (or it can't be read)
+    empty,    // nothing but blanks
+    too_long, // over 4 KiB
+    not_ascii // a character the Wine registry can't take
 };
 // The file in folder (any case), at most 4 KiB: its first line, trimmed of whitespace and a
-// byte order mark, in value (found only). The text is a secret of the player's (a product
-// code): never log it.
+// byte order mark, in value (found only). Reads UTF-8 (the default on new Windows) and UTF-16
+// with a byte order mark; strips a non-breaking space and a zero-width space at the edges;
+// not_ascii when a character the registry can't take is in what remains. The text is a secret
+// of the player's (a product code): never log it.
 FileValue file_value(const std::string &folder, const std::string &relative, std::string &value);
 // The page's sentence for a file_value that isn't found, translated; it names the file only.
 std::string file_value_error(FileValue state, const std::string &relative);

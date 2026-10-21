@@ -243,20 +243,71 @@ FileValue file_value(const std::string &folder, const std::string &relative, std
         }
     }
     close(fd);
-    if (text.starts_with("\xEF\xBB\xBF"))
+    // UTF-16 with a byte order mark (Notepad's old "Unicode" default): each 16-bit code unit
+    // either fits ASCII or doesn't fit the Wine registry, so the not-fit ones become a sentinel
+    // byte that the not_ascii check rejects at the end.
+    const auto b = [&text](std::size_t i)
+    { return static_cast<unsigned char>(text[i]); };
+    if (text.size() >= 2 && ((b(0) == 0xFF && b(1) == 0xFE) || (b(0) == 0xFE && b(1) == 0xFF)))
+    {
+        const bool little_endian = b(0) == 0xFF;
+        std::string ascii;
+        ascii.reserve(text.size() / 2);
+        for (std::size_t i = 2; i + 1 < text.size(); i += 2)
+        {
+            const unsigned code = little_endian ? (b(i) | (b(i + 1) << 8))
+                                                : ((b(i) << 8) | b(i + 1));
+            ascii.push_back(code <= 0x7F ? static_cast<char>(code) : '\x01');
+        }
+        text = std::move(ascii);
+    }
+    else if (text.starts_with("\xEF\xBB\xBF"))
+    {
         text.erase(0, 3);
-    const auto blank = [](char c)
-    { return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f'; };
+    }
+    // Blank at i: the width of a blank byte or multi-byte sequence (space, tab, NBSP, zero-width
+    // space, a stray UTF-8 byte order mark), or 0 for not a blank.
+    const auto blank_at = [&text, &b](std::size_t i) -> std::size_t
+    {
+        if (i >= text.size())
+            return 0;
+        const unsigned char c = b(i);
+        if (c == ' ' || c == '\t' || c == '\v' || c == '\f' || c == 0xA0)
+            return 1;
+        if (i + 1 < text.size() && c == 0xC2 && b(i + 1) == 0xA0)
+            return 2;
+        if (i + 2 < text.size() && c == 0xE2 && b(i + 1) == 0x80 && b(i + 2) == 0x8B)
+            return 3;
+        if (i + 2 < text.size() && c == 0xEF && b(i + 1) == 0xBB && b(i + 2) == 0xBF)
+            return 3;
+        return 0;
+    };
+    const auto blank_before = [&b, &blank_at](std::size_t end, std::size_t start) -> std::size_t
+    {
+        if (end <= start)
+            return 0;
+        if (end >= start + 3 && blank_at(end - 3) == 3)
+            return 3;
+        if (end >= start + 2 && blank_at(end - 2) == 2)
+            return 2;
+        const unsigned char c = b(end - 1);
+        if (c == ' ' || c == '\t' || c == '\v' || c == '\f' || c == 0xA0)
+            return 1;
+        return 0;
+    };
     std::size_t start = 0;
-    while (start < text.size() && blank(text[start]))
-        ++start;
+    while (const auto width = blank_at(start))
+        start += width;
     std::size_t end = start;
     while (end < text.size() && text[end] != '\r' && text[end] != '\n')
         ++end;
-    while (end > start && blank(text[end - 1]))
-        --end;
+    while (const auto width = blank_before(end, start))
+        end -= width;
     if (end == start)
         return FileValue::empty;
+    for (std::size_t i = start; i < end; ++i)
+        if (b(i) < 0x20 || b(i) > 0x7E)
+            return FileValue::not_ascii;
     value = text.substr(start, end - start);
     return FileValue::found;
 }
@@ -274,6 +325,10 @@ std::string file_value_error(FileValue state, const std::string &relative)
     case FileValue::empty:
         return i18n::trf("{0} in your game folder is empty. Put the product code you typed when "
                          "installing the game on the PC in it, on one line.",
+                         {relative});
+    case FileValue::not_ascii:
+        return i18n::trf("{0} in your game folder has a character that can't be used. Open it in "
+                         "Notepad, type the code yourself, and save it as ANSI.",
                          {relative});
     case FileValue::missing:
         break;

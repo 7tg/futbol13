@@ -101,6 +101,10 @@ const Row kStrings[] = {
     {{"{0} in your game folder is empty. Put the product code you typed when installing the game "
       "on the PC in it, on one line.",
       "Oyun klasörünüzdeki {0} boş. PC'ye kurarken girdiğiniz ürün kodunu tek satır olarak içine yazın."}},
+    {{"{0} in your game folder has a character that can't be used. Open it in Notepad, type the "
+      "code yourself, and save it as ANSI.",
+      "Oyun klasörünüzdeki {0} dosyasında kullanılamayan bir karakter var. Not Defteri ile açıp "
+      "kodu kendi elinizle yazın ve ANSI olarak kaydedin."}},
     {{"No {0} in your game folder. Put the product code you typed when installing the game on "
       "the PC in it, on one line.",
       "Oyun klasörünüzde {0} yok. PC'ye kurarken girdiğiniz ürün kodunu tek satır olarak içine "
