@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Makes the app's SOURCES.txt and THIRD_PARTY.md say what Sahin's app holds.
+"""Makes the app's SOURCES.txt and THIRD_PARTY.md say what FUTBOL13's app holds.
 
   tools/make-notices.py APP REV
 
@@ -8,20 +8,20 @@ copies them into the game's app; there they name neither this repo, nor the laun
 the app's eboot.bin, nor our DXVK. GPL-3 §6 and LGPL-2.1 §4 want whoever holds the binaries to
 find their exact source, so this rewrites them, in place:
 
-  SOURCES.txt     Sahin's repository and commit (REV), the launcher, DXVK (the version and commit
+  SOURCES.txt     FUTBOL13's repository and commit (REV), the launcher, DXVK (the version and commit
                   tools/build-dxvk.sh pins, with patches/dxvk), the patched trees (base commit +
                   patches/<project>), then prospero-win's own lines as they were.
   THIRD_PARTY.md  what the app's own parts are and their licences (the launcher, game.bin, DXVK,
                   ps5-opengl, the bare prefix, the art), then prospero-win's text, which in this
-                  folder describes game.bin and PPSA99404 rather than eboot.bin and PPSA99995.
+                  folder describes game.bin and PPSA99405 rather than eboot.bin and PPSA99995.
 
-Running it twice gives the same files: the Sahin part is replaced, never stacked.
+Running it twice gives the same files: the FUTBOL13 part is replaced, never stacked.
 """
 import json, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-REPO = "https://github.com/7tg/sahin"
-MARK = "<!-- sahin-notices-end -->"
+REPO = "https://github.com/7tg/futbol13"
+MARK = "<!-- futbol13-notices-end -->"
 SOURCES_MARK = "---- prospero-win's package ----"
 
 
@@ -45,27 +45,27 @@ def pins(script=ROOT / "tools/build-prospero-win.sh"):
 
 
 def sources(old, rev, version, tid):
-    """SOURCES.txt: Sahin's parts, then prospero-win's lines after SOURCES_MARK."""
+    """SOURCES.txt: FUTBOL13's parts, then prospero-win's lines after SOURCES_MARK."""
     old = old.split(SOURCES_MARK + "\n", 1)[-1].lstrip("\n")
     dxvk_version, dxvk_commit = dxvk_pin()
     base = pins()
     lines = [
-        f"Source for {tid} (Sahin {version}). THIRD_PARTY.md says what each part is and its licence.",
+        f"Source for {tid} (FUTBOL13 {version}). THIRD_PARTY.md says what each part is and its licence.",
         "",
-        f"Sahin  {REPO}  commit {rev}",
+        f"FUTBOL13  {REPO}  commit {rev}",
         f"  the repository that builds this folder (tools/build.sh), tag {version}; it holds the",
         "  launcher (eboot.bin, launcher/), the install profile, the art and the patches below",
-        f"Sahin launcher (eboot.bin, store-worker.elf)  {REPO}  launcher/ at commit {rev}",
+        f"FUTBOL13 launcher (eboot.bin, store-worker.elf)  {REPO}  launcher/ at commit {rev}",
         "  a fork of https://github.com/lavavex/nfs-blackbox-launcher (Prospero BlackBox, from",
         "  BlackBearReloaded's ProsperoStore); its own notices: LICENSES/launcher/THIRD_PARTY_NOTICES.md",
-        f"DXVK {dxvk_version} (d3d8, d3d9, d3d10core, d3d11, dxgi in assets/bundle/bare-prefix-sahin.zip)",
+        f"DXVK {dxvk_version} (d3d8, d3d9, d3d10core, d3d11, dxgi in assets/bundle/bare-prefix-futbol13.zip)",
         f"  https://github.com/doitsujin/dxvk  commit {dxvk_commit} (v3.1.1)",
-        f"  with patches/dxvk ({patch_count('dxvk')} patches) from the Sahin repository",
+        f"  with patches/dxvk ({patch_count('dxvk')} patches) from the FUTBOL13 repository",
         "ps5-opengl (linked into eboot.bin)  https://github.com/mpereiraesaa/ps5-opengl",
-        f"  the submodule commit the Sahin repository pins at commit {rev}",
+        f"  the submodule commit the FUTBOL13 repository pins at commit {rev}",
         "",
         "prospero-win, PS5_Mesa and PS5_Vulkan are built from the commits below with the patches in",
-        "the Sahin repository's patches/ directory (tools/build-prospero-win.sh), so their revisions",
+        "the FUTBOL13 repository's patches/ directory (tools/build-prospero-win.sh), so their revisions",
         "named by prospero-win's packager are those patched trees:",
         f"  prospero-win  commit {base.get('PW_BASE', '?')} + patches/prospero-win ({patch_count('prospero-win')} patches)",
         f"  PS5_Mesa  commit {base.get('MESA_BASE', '?')} + patches/PS5_Mesa ({patch_count('PS5_Mesa')} patches)",
@@ -79,7 +79,7 @@ def sources(old, rev, version, tid):
 
 
 def third_party(old, rev, version, tid):
-    """THIRD_PARTY.md: Sahin's parts, then prospero-win's text, read for this folder."""
+    """THIRD_PARTY.md: FUTBOL13's parts, then prospero-win's text, read for this folder."""
     old = old.split(MARK + "\n", 1)[-1].lstrip("\n")
     pw = (old.replace("PPSA99995", tid)
              .replace("## The title: `eboot.bin`, `sce_module/libc.prx`",
@@ -91,15 +91,15 @@ def third_party(old, rev, version, tid):
     dxvk_version, _ = dxvk_pin()
     head = f"""# Third-party software in the app folder
 
-The `{tid}` folder is Sahin {version}, built from <{REPO}> at commit
+The `{tid}` folder is FUTBOL13 {version}, built from <{REPO}> at commit
 `{rev}` by its `tools/build.sh`. `SOURCES.txt` names the exact source revision
 of every part, so you can get the source that matches the binaries you have.
 The licence texts are in `LICENSES/`. The folder holds no game file: the
-player's own copy of Blur is installed from their folder on the console.
+player's own copy of PES 2013 is installed from their folder on the console.
 
 ## The launcher: `eboot.bin`, `store-worker.elf`, `assets/`
 
-Sahin's launcher, GPL-3.0-or-later (`LICENSE` in `launcher/` of the
+FUTBOL13's launcher, GPL-3.0-or-later (`LICENSE` in `launcher/` of the
 repository; `LICENSES/GPL-3.0.txt`). It is a fork of
 [nfs-blackbox-launcher](https://github.com/lavavex/nfs-blackbox-launcher)
 by lavavex (Prospero BlackBox), itself from BlackBearReloaded's ProsperoStore
@@ -119,7 +119,7 @@ prospero-win's title, which starts the game, with Wine, FreeType, the Vulkan
 driver, Mesa WGL/Zink and the privilege helper: prospero-win's own text below
 describes them, section by section.
 
-## DXVK: `assets/bundle/bare-prefix-sahin.zip`
+## DXVK: `assets/bundle/bare-prefix-futbol13.zip`
 
 The bare Wine prefix the launcher unpacks carries Wine's builtin DLLs (Wine,
 LGPL-2.1-or-later, below) and our build of [DXVK](https://github.com/doitsujin/dxvk)
@@ -131,15 +131,13 @@ commit and the patches applied.
 
 ## The art: `sce_sys/`
 
-The icon and the Home-screen pictures are Sahin's own, drawn by `art/make-art.py`
+The icon and the Home-screen pictures are FUTBOL13's own, drawn by `art/make-art.py`
 in the repository, GPL-3.0-or-later. Nothing comes from the game.
 
 ## Mods
 
-The app ships no mod. At install the console downloads, each pinned by SHA-256
-in `assets/plans/BLUR.json`, the Ultimate ASI Loader (ThirteenAG, MIT),
-amax-redirect.asi (Aib0t, MIT) and, if chosen, the Amax client files from
-amax-emu.com, each from its own page.
+The app ships no mod and downloads nothing. The player's folder is installed as it is, with
+whatever they added on the PC.
 
 {MARK}
 

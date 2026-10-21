@@ -27,9 +27,9 @@ Every module under `win/wine/lib/wine/` comes from Wine.
 
 
 def app(tmp_path):
-    a = tmp_path / "PPSA99404"
+    a = tmp_path / "PPSA99405"
     (a / "sce_sys").mkdir(parents=True)
-    (a / "sce_sys/param.json").write_text(json.dumps({"titleId": "PPSA99404", "contentVersion": "01.002.000"}))
+    (a / "sce_sys/param.json").write_text(json.dumps({"titleId": "PPSA99405", "contentVersion": "01.000.000"}))
     (a / "SOURCES.txt").write_text(PW_SOURCES)
     (a / "THIRD_PARTY.md").write_text(PW_THIRD_PARTY)
     return a
@@ -44,12 +44,12 @@ def dxvk_commit():
     return re.search(r"^commit=([0-9a-f]{40})$", (ROOT / "tools/build-dxvk.sh").read_text(), re.M).group(1)
 
 
-def test_sources_name_sahin_the_launcher_and_dxvk(tmp_path):
+def test_sources_name_futbol13_the_launcher_and_dxvk(tmp_path):
     a = app(tmp_path)
     assert run(a).returncode == 0
     text = (a / "SOURCES.txt").read_text()
-    assert text.startswith("Source for PPSA99404 (Sahin 01.002.000).")
-    assert f"https://github.com/7tg/sahin  commit {REV}" in text
+    assert text.startswith("Source for PPSA99405 (FUTBOL13 01.000.000).")
+    assert f"https://github.com/7tg/futbol13  commit {REV}" in text
     assert "nfs-blackbox-launcher" in text
     assert dxvk_commit() in text and "patches/dxvk (2 patches)" in text
     assert "644e32e400c555e340d507383398c5d21b39b0b0 + patches/prospero-win" in text
@@ -62,14 +62,18 @@ def test_third_party_describes_this_folder(tmp_path):
     assert run(a).returncode == 0
     text = (a / "THIRD_PARTY.md").read_text()
     assert "PPSA99995" not in text
-    assert text.startswith("# Third-party software in the app folder\n\nThe `PPSA99404` folder is Sahin 01.002.000")
+    assert text.startswith("# Third-party software in the app folder\n\nThe `PPSA99405` folder is FUTBOL13 01.000.000")
     assert f"commit\n`{REV}`" in text
     assert "## The launcher: `eboot.bin`" in text and "GPL-3.0-or-later" in text
-    assert "## DXVK: `assets/bundle/bare-prefix-sahin.zip`" in text
+    assert "## DXVK: `assets/bundle/bare-prefix-futbol13.zip`" in text
     assert "## The runner: `game.bin`, `sce_module/libc.prx`" in text
     assert "linked into\n`game.bin`," in text and "linked into\n`eboot.bin`" not in text
     assert "## Wine: `win/wine/`" in text  # prospero-win's text follows
     assert text.count("# Third-party software in the app folder") == 1
+    assert "player's own copy of PES 2013" in text
+    assert "The app ships no mod and downloads nothing." in text
+    assert "amax" not in text.lower()
+    assert "sahin" not in text.lower() and "blur" not in text.lower()
 
 
 def test_running_twice_gives_the_same_files(tmp_path):
