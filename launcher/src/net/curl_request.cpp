@@ -129,7 +129,7 @@ Response curl_request(const std::string &url, std::uint64_t limit, const Sink &s
     set(CURLOPT_FOLLOWLOCATION, 0L);
     set(CURLOPT_SSL_VERIFYPEER, 1L);
     set(CURLOPT_SSL_VERIFYHOST, 2L);
-    set(CURLOPT_USERAGENT, "FUTBOL13/01.000.000");
+    set(CURLOPT_USERAGENT, "FUTBOL13/01.000.001");
     set(CURLOPT_ACCEPT_ENCODING, "identity");
     set(CURLOPT_CONNECTTIMEOUT, 15L);
     // A server may take a while to send its first byte, and a slow line stalls for seconds:
