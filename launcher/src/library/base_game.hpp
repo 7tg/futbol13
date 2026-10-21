@@ -78,7 +78,8 @@ enum class FileValue
 };
 // The file in folder (any case), at most 4 KiB: its first line, trimmed of whitespace and a
 // byte order mark, in value (found only). Reads UTF-8 (the default on new Windows) and UTF-16
-// with a byte order mark; strips a non-breaking space and a zero-width space at the edges;
+// with a byte order mark; reads an en or em dash as a hyphen; strips a non-breaking space and a
+// zero-width space at the edges;
 // not_ascii when a character the registry can't take is in what remains. The text is a secret
 // of the player's (a product code): never log it.
 FileValue file_value(const std::string &folder, const std::string &relative, std::string &value);

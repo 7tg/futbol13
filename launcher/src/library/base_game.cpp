@@ -265,6 +265,21 @@ FileValue file_value(const std::string &folder, const std::string &relative, std
     {
         text.erase(0, 3);
     }
+    // Autocorrect turns a typed hyphen into an en dash (U+2013) or an em dash (U+2014).
+    {
+        std::string dashed;
+        dashed.reserve(text.size());
+        for (std::size_t i = 0; i < text.size();)
+            if (i + 2 < text.size() && b(i) == 0xE2 && b(i + 1) == 0x80 &&
+                (b(i + 2) == 0x93 || b(i + 2) == 0x94))
+            {
+                dashed.push_back('-');
+                i += 3;
+            }
+            else
+                dashed.push_back(text[i++]);
+        text = std::move(dashed);
+    }
     // Blank at i: the width of a blank byte or multi-byte sequence (space, tab, NBSP, zero-width
     // space, a stray UTF-8 byte order mark), or 0 for not a blank.
     const auto blank_at = [&text, &b](std::size_t i) -> std::size_t

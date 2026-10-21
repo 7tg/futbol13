@@ -614,6 +614,14 @@ int main()
         assert(!apply_registry(coded, paths, options.now, error) && error == not_ascii);
         // The old registry-level "Can't set …" message is never shown for a from_file value now.
         assert(error.find("Can't set") == std::string::npos);
+        // Word, Edge or Windows autocorrect replaces a plain hyphen with an em dash (U+2014,
+        // UTF-8 E2 80 94) or an en dash (U+2013, E2 80 93): both come through as a plain hyphen.
+        put(installed / "CODE.TXT", std::string("DASH\xE2\x80\x94" "1111\n"));
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "DASH-1111");
+        put(installed / "CODE.TXT", std::string("DASH\xE2\x80\x93" "2222\n"));
+        assert(apply_registry(coded, paths, options.now, error));
+        assert(code_in_registry() == "DASH-2222");
         // The other values are written too, the file's text nowhere but its value.
         assert(read(prefix / "system.reg").find("\"Install Dir\"=\"C:\\\\Games\\\\GAME\\\\\"") !=
                std::string::npos);
