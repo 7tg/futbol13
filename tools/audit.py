@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fails when a tree holds what Sahin must never ship: Windows executables we didn't build,
+"""Fails when a tree holds what FUTBOL13 must never ship: Windows executables we didn't build,
 game data, publisher media or Microsoft redistributables.
 
   tools/audit.py ROOT [ROOT...]
@@ -15,9 +15,10 @@ dropped among Wine's is still caught. Exit 0 clean, 1 with one line per finding.
 import fnmatch, pathlib, sys, zipfile
 
 BANNED_NAMES = ["blur.exe", "speed.exe", "binkw32.dll", "d3dx9_*.dll", "d3dcompiler_*.dll",
-                "msvcr*.dll", "msvcp*.dll", "xinput1_*.dll", "physx*.dll", "*.securom"]
+                "msvcr*.dll", "msvcp*.dll", "xinput1_*.dll", "physx*.dll", "*.securom",
+                "pes2013.exe", "settings.exe", "rld.dll", "option.bin", "edit0*", "settings.dat"]
 BANNED_EXT = {".bik", ".bk2", ".at9", ".pak", ".sig", ".level", ".levelphysics",
-              ".levelrender", ".levelstream", ".asi", ".cab"}
+              ".levelrender", ".levelstream", ".asi", ".cab", ".img", ".sfd"}
 WINE_MARKERS = (b"Wine builtin DLL", b"Wine placeholder DLL")
 SKIP_DIRS = {".git", "prospero-win", "PS5_Mesa", "PS5_Vulkan", "PS5_PayloadSDK",
              "ps5-native-app-boilerplate", "ps5-opengl", ".deps", "build", "node_modules"}

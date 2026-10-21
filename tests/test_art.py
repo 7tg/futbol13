@@ -4,9 +4,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 # Sizes and modes the app build validates (build_game_app.sh): icon 512x512,
 # background 3840x2160 RGB, logo 3840x2160 RGBA.
-FILES = (("sahin.png", (512, 512), "RGB"),
-         ("sahin-bg.png", (3840, 2160), "RGB"),
-         ("sahin-logo.png", (3840, 2160), "RGBA"))
+FILES = (("futbol13.png", (512, 512), "RGB"),
+         ("futbol13-bg.png", (3840, 2160), "RGB"),
+         ("futbol13-logo.png", (3840, 2160), "RGBA"))
 
 
 def test_art_sizes_and_determinism(tmp_path):

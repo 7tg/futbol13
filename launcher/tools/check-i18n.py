@@ -190,11 +190,11 @@ def main():
                 problems.append(f"{language} has other {{0}}s than the English: {key!r}")
     # The plan's option titles and descriptions reach the page as data (OptionView), so they are
     # demanded here by name.
-    plan = json.loads((ROOT / "assets" / "plans" / "BLUR.json").read_text(encoding="utf-8"))
+    plan = json.loads((ROOT / "assets" / "plans" / "PES2013.json").read_text(encoding="utf-8"))
     for option in plan.get("options", []):
         for key in ("title", "description"):
             if option.get(key) and option[key] not in english:
-                problems.append(f"assets/plans/BLUR.json: not in the table: {option[key]!r}")
+                problems.append(f"assets/plans/PES2013.json: not in the table: {option[key]!r}")
     for sentence, where in sorted(used_sentences().items()):
         if sentence not in english and not re.fullmatch(r"[^A-Za-z]*", sentence):
             problems.append(f"{where}: not in the table: {sentence!r}")

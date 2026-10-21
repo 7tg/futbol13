@@ -15,10 +15,10 @@ def test_pe_file_fails(tmp_path):
     assert r.returncode == 1 and "x.bin" in r.stdout
 
 def test_media_and_game_data_fail(tmp_path):
-    for name in ("intro.bik", "cover.at9", "gamedata.pak", "Blur.exe", "d3dx9_42.dll"):
+    for name in ("intro.bik", "cover.at9", "gamedata.pak", "pes2013.exe", "d3dx9_42.dll"):
         (tmp_path / name).write_bytes(b"x")
     out = run(tmp_path).stdout
-    for name in ("intro.bik", "cover.at9", "gamedata.pak", "Blur.exe", "d3dx9_42.dll"):
+    for name in ("intro.bik", "cover.at9", "gamedata.pak", "pes2013.exe", "d3dx9_42.dll"):
         assert name in out
 
 def test_allowlist_file_skips_known_builds(tmp_path):
@@ -59,9 +59,9 @@ def test_zip_allow_glob_does_not_cover_other_members(tmp_path):
     assert r.returncode == 1 and "evil.exe" in r.stdout and "wine.dll" not in r.stdout
 
 def test_banned_name_inside_zip_fails(tmp_path):
-    make_zip(tmp_path / "b.zip", {"game/Blur.exe": b"x", "media/intro.bik": b"x"})
+    make_zip(tmp_path / "b.zip", {"game/pes2013.exe": b"x", "media/intro.bik": b"x"})
     out = run(tmp_path).stdout
-    assert "b.zip!game/Blur.exe" in out and "b.zip!media/intro.bik" in out
+    assert "b.zip!game/pes2013.exe" in out and "b.zip!media/intro.bik" in out
 
 def test_plain_allow_line_does_not_cover_zip_members(tmp_path):
     # A plain allow line for the zip path does not vouch for its members.
@@ -78,3 +78,16 @@ def test_zip_wine_rule_allows_only_wine_builtins(tmp_path):
     (tmp_path / ".audit-allow").write_text("p.zip!wine:drive_c/windows/*\n")
     out = run(tmp_path).stdout
     assert "kernel32.dll" not in out and "real.dll" in out
+
+
+def test_pes_data_and_crack_fail(tmp_path):
+    (tmp_path / "img").mkdir()
+    (tmp_path / "img/dt00_e.img").write_bytes(b"x")
+    (tmp_path / "rld.dll").write_bytes(b"x")
+    (tmp_path / "art.png").write_bytes(b"x")
+    (tmp_path / "tool.py").write_text("print(1)\n")
+    r = run(tmp_path)
+    lines = r.stdout.splitlines()
+    assert r.returncode == 1 and len(lines) == 2
+    assert any("dt00_e.img" in l for l in lines) and any("rld.dll" in l for l in lines)
+    assert "art.png" not in r.stdout and "tool.py" not in r.stdout
