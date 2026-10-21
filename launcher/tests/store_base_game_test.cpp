@@ -35,9 +35,9 @@ int main()
     assert(mkdtemp(temporary));
     const fs::path root = temporary;
 
-    // Blur's own manifest: mods are left out, an unknown copy is a warning.
-    const Manifest *blur = manifest_for("BLUR");
-    assert(blur && blur->mods_left_out && blur->accept_unknown && manifest_for("OTHER") == nullptr);
+    // Only PES 2013 is known; Blur and anything else have no manifest.
+    assert(manifest_for("PES2013") && manifest_for("BLUR") == nullptr &&
+           manifest_for("OTHER") == nullptr);
 
     // A small game of the same shape, its releases told by data.bin.
     const std::string current(3000, 'c'), older(2000, 'o');
@@ -53,8 +53,8 @@ int main()
     fs::create_directories(data);
     const std::vector<std::string> roots{usb.string()};
     auto found = locate(data.string(), roots, game);
-    assert(found.state == State::absent && found.detail.find("base-games/Game ") != std::string::npos &&
-           found.detail.find("named Game (any case)") != std::string::npos);
+    assert(found.state == State::absent && found.detail.find("base-games/GAME ") != std::string::npos &&
+           found.detail.find("named GAME (any case)") != std::string::npos);
 
     // On USB, its names in any case: found there, the older release, to be patched.
     put(usb / "game" / "Game.EXE", "exe");
@@ -170,6 +170,24 @@ int main()
         assert(seen.state == State::ready && seen.version == "1.2");
         assert(seen.warning.find("root.pak") != std::string::npos);
         assert(seen.detail.find("left out") != std::string::npos);
+    }
+
+    {
+        // An unversioned manifest: the entries are there, so the copy is ready, as it is.
+        const auto *pes = manifest_for("PES2013");
+        assert(pes && pes->unversioned && pes->releases.empty() && pes->mod_files.empty());
+        const auto folder = fs::temp_directory_path() / "pes-copy";
+        fs::remove_all(folder);
+        put(folder / "PES2013.EXE", std::string(10, 'x'));
+        put(folder / "IMG/dt00_e.img", std::string(1000, 'd'));
+        put(folder / "rld.dll", "mod");          // anything else is simply part of the copy
+        auto got = inspect(folder.string(), *pes);
+        assert(got.state == State::ready && got.version.empty() && got.warning.empty());
+        assert(got.detail.find("as it is") != std::string::npos);
+        fs::remove_all(folder / "IMG");
+        got = inspect(folder.string(), *pes);
+        assert(got.state == State::incomplete && got.detail.find("img") != std::string::npos);
+        fs::remove_all(folder);
     }
 
     fs::remove_all(root);

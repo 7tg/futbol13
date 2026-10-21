@@ -5,6 +5,8 @@
 #include "library/tree.hpp"
 #include "third_party/miniz/miniz.h"
 #include <cerrno>
+#include <cstdio>
+#include <filesystem>
 #include <cstring>
 #include <dirent.h>
 #include <map>
@@ -13,7 +15,6 @@
 #include <fcntl.h>
 #include <strings.h>
 #include <sys/stat.h>
-#include <cctype>
 #include <unistd.h>
 
 namespace store::library
@@ -22,26 +23,18 @@ namespace
 {
 // ---- the games ----------------------------------------------------------------
 
-// Blur (2010) for PC: one release, 1.2. The exe is never checked (any exe is
-// accepted); cache/root.pak tells a known copy, and an unknown one is installed with a warning.
-constexpr const char *kBlurFolders[] = {"cache", "levels", "UI", "UI/movies"};
-constexpr const char *kBlurFiles[] = {"Blur.exe", "binkw32.dll", "cache/root.pak",
-                                      "cache/gamedata.pak", "cache/boot.pak",
-                                      "cache/gamedata.sig", "cache/gamedata_boot.sig"};
-constexpr Release kBlurReleases[] = {
-    {"1.2", 559652864, 0x1deb5c87, false},
-};
-constexpr const char *kBlurModFiles[] = {"scripts", "amax", "dinput8.dll", "d3d9.dll", "dsound.dll",
-                                         "lua5.1.dll", "discord-rpc.dll"};
-constexpr Manifest kBlur = []
+// Pro Evolution Soccer 2013 for PC: players mod it heavily (squad updates, commentary), so
+// the copy is taken as it is. Only the exe and the img folder must be there.
+constexpr const char *kPesFolders[] = {"img"};
+constexpr const char *kPesFiles[] = {"pes2013.exe"};
+constexpr Manifest kPes = []
 {
-    Manifest m{"BLUR", kBlurFolders, kBlurFiles, "cache/root.pak", kBlurReleases, kBlurModFiles};
-    m.mods_left_out = true;
-    m.accept_unknown = true;
+    Manifest m{"PES2013", kPesFolders, kPesFiles, "", {}, {}};
+    m.unversioned = true;
     return m;
 }();
 
-constexpr const Manifest *kManifests[] = {&kBlur};
+constexpr const Manifest *kManifests[] = {&kPes};
 
 // ---- files ----------------------------------------------------------------------
 
@@ -144,6 +137,31 @@ std::string join(const std::vector<std::string> &items)
     return text;
 }
 
+// The bytes in a folder's regular files, links not followed, unreadable parts skipped.
+std::uint64_t folder_bytes(const std::string &folder)
+{
+    namespace fs = std::filesystem;
+    std::uint64_t total = 0;
+    std::error_code error;
+    for (fs::recursive_directory_iterator it(folder, fs::directory_options::skip_permission_denied, error), end;
+         !error && it != end; it.increment(error))
+        if (std::error_code e; it->is_regular_file(e) && !it->is_symlink(e))
+            if (const auto size = it->file_size(e); !e)
+                total += size;
+    return total;
+}
+
+// "5.7 GB" from a gigabyte up, "930 MB" below.
+std::string size_text(std::uint64_t bytes)
+{
+    char text[32];
+    if (bytes >= 1'000'000'000)
+        std::snprintf(text, sizeof text, "%.1f GB", static_cast<double>(bytes) / 1e9);
+    else
+        std::snprintf(text, sizeof text, "%.0f MB", static_cast<double>(bytes) / 1e6);
+    return text;
+}
+
 } // namespace
 
 const Manifest *manifest_for(const std::string &folder)
@@ -209,6 +227,13 @@ BaseGame inspect(const std::string &folder, const Manifest &manifest)
                                   {join(mods)});
         return result;
     }
+    if (manifest.unversioned)
+    {
+        result.state = State::ready;
+        result.detail = i18n::trf("Copied as it is, mods and updates included ({0}).",
+                                  {size_text(folder_bytes(folder))});
+        return result;
+    }
     const auto version_path = find_entry(folder, manifest.version_file);
     std::uint64_t size = 0;
     std::uint32_t crc = 0;
@@ -250,7 +275,7 @@ BaseGame locate(const std::string &data_root, std::span<const std::string> roots
                 const Manifest &manifest)
 {
     const auto base = data_root + "/base-games/" + manifest.folder;
-    // base-games/Blur, BLUR or blur: whatever case the copy was made in.
+    // base-games/PES2013, pes2013 or Pes2013: whatever case the copy was made in.
     if (const auto existing = find_entry(data_root + "/base-games", manifest.folder);
         !existing.empty() && is_directory(existing))
         return inspect(existing, manifest);
@@ -263,13 +288,9 @@ BaseGame locate(const std::string &data_root, std::span<const std::string> roots
         }
     BaseGame absent;
     absent.path = base;
-    // The folder's name as people write it (BLUR: Blur); any case is found.
-    std::string shown = manifest.folder;
-    for (std::size_t i = 1; i < shown.size(); i++)
-        shown[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(shown[i])));
-    absent.detail = i18n::trf("Put a clean install in {0}/base-games/{1} over FTP, or on a USB drive "
-                              "in a folder named {1} (any case).",
-                              {data_root, shown});
+    absent.detail = i18n::trf("Put the game folder in {0}/base-games/{1} over FTP, or on a USB "
+                              "drive in a folder named {1} (any case).",
+                              {data_root, manifest.folder});
     return absent;
 }
 

@@ -95,6 +95,8 @@ const Row kStrings[] = {
       "first.",
       "Bitirmek için Sahin'i kapatıp yeniden açın. Eski sürüm açılırsa önce konsolu yeniden "
       "başlatın."}},
+    {{"Copied as it is, mods and updates included ({0}).",
+      "Olduğu gibi kopyalanır, modlar ve güncellemeler dahil ({0})."}},
     {{"Copied to the console; the USB drive can go",
       "Konsola kopyalandı; USB bellek çıkarılabilir"}},
     {{"Copies your game from the USB drive to the console first. The USB copy is left as it is.",
@@ -200,10 +202,10 @@ const Row kStrings[] = {
     {{"Press Play. Its settings are in the game: Options, PS5 Options.",
       "Oyna'ya basın. Ayarları oyunun içinde: Options, PS5 Options."}},
     {{"Previous folder kept in {0}.", "Önceki klasör {0} içinde tutuldu."}},
-    {{"Put a clean install in {0}/base-games/{1} over FTP, or on a USB drive in a folder named "
+    {{"Put the game folder in {0}/base-games/{1} over FTP, or on a USB drive in a folder named "
       "{1} (any case).",
-      "Temiz bir kurulumu FTP ile {0}/base-games/{1} içine ya da bir USB bellekte {1} adlı bir "
-      "klasöre koyun (büyük küçük harf fark etmez)."}},
+      "Oyun klasörünü FTP ile {0}/base-games/{1} konumuna koyun ya da bir USB bellekte {1} adlı "
+      "bir klasöre (büyük küçük harf fark etmez)."}},
     {{"Putting its app on the Home screen", "Uygulaması Ana ekrana konuyor"}},
     {{"Queued behind another app", "Başka bir uygulamanın ardında sırada"}},
     {{"Ready to install", "Yüklemeye hazır"}},

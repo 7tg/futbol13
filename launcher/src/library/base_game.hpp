@@ -34,9 +34,11 @@ struct Manifest
     bool mods_left_out = false;  // mod files in a copy are left out of the install, not refused
     bool accept_unknown = false; // an unknown version file is a warning: the copy counts as the
                                  // first release (the page shows the warning)
+    bool unversioned = false;    // no version file and no releases: a copy with the entries is
+                                 // ready and installed as it is, mods included (PES 2013)
 };
 
-// The manifest for a base-games folder name (BLUR...), or nullptr.
+// The manifest for a base-games folder name (PES2013...), or nullptr.
 const Manifest *manifest_for(const std::string &folder);
 
 enum class State
