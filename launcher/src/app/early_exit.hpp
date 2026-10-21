@@ -1,4 +1,4 @@
-// Sahin - The game closing right after it started, told on the launcher's next start; and what
+// FUTBOL13 - The game closing right after it started, told on the launcher's next start; and what
 // that start does: the game, the page, or back to Home.
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
@@ -12,10 +12,10 @@ namespace store
 {
 // A game that is back within this many seconds of its start closed right after it started.
 inline constexpr std::time_t kEarlyExitSeconds = 20;
-// What the page says then: the likely cause is a retail Blur.exe, whose SecuROM won't run here.
+// What the page says then: a copy that doesn't start under Wine on a PC won't start here.
 inline constexpr const char *kEarlyExitHint =
-    "Blur closed right after it started. A retail Blur.exe carries SecuROM, which doesn't run "
-    "here.";
+    "PES 2013 closed right after it started. A copy that doesn't start under Wine on a PC won't "
+    "start here either; check it there first.";
 
 // Writes now (seconds since the epoch) into path, as the game is started. False when it
 // can't be written.

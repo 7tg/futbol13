@@ -426,7 +426,7 @@ void Screen::rebuild()
         // The whole collection in release order, the games still in progress greyed.
         shelf("The collection", [](const App &) { return true; }, 3);
         shelf("On this console", [](const App &a) { return !a.installed.empty(); }, 0);
-        // A fresh page opens on its first shelf's resting place (Blur, not a greyed game).
+        // A fresh page opens on its first shelf's resting place (PES 2013, not a greyed game).
         if (previous.empty() && !shelves_.empty() && focus_ == 0)
             focus_ = shelves_.front().start + shelves_.front().pos;
     }
@@ -674,10 +674,12 @@ void Screen::refresh_detail()
         else
         {
             blocks.push_back(Block::paragraph(
-                trs("1. Install Blur, the PC game, on a computer. Leave it unmodded.")));
+                trs("1. Install PES 2013, the PC game, on a computer. Add the squad updates, "
+                    "commentary and other patches you want there.")));
             blocks.push_back(Block::paragraph(
-                trs("2. Copy the whole game folder, the one with Blur.exe, to the PS5: over FTP to "
-                    "/data/sahin/base-games/Blur (any case works), or to a USB drive as a folder named Blur at its top.")));
+                trs("2. Copy the whole game folder, the one with pes2013.exe and img, to the PS5: "
+                    "over FTP to /data/futbol13/base-games/PES2013 (any case works), or to a USB "
+                    "drive as a folder named PES2013 at its top.")));
             blocks.push_back(Block::paragraph(
                 trs("3. This page notices the copy by itself. Then press Install.")));
             if (base.state != State::absent)
@@ -1278,7 +1280,7 @@ void Screen::update_page(const InputFrame &input, ui::Feedback &feedback)
             ask_ = Ask::adopt;
             ask_id_ = shown.title_id;
             dialog_.open({ui::StatusKind::question,
-                          "Manage " + shown.name + " with Sahin?",
+                          "Manage " + shown.name + " with FUTBOL13?",
                           "Nothing is changed now. From then on its updates are offered here. An "
                           "update replaces the app's whole folder; the previous one, with "
                           "anything you added inside it, is kept in the store's \"previous\" "
@@ -1772,7 +1774,7 @@ void Screen::draw_top_bar(const ui::Fonts &fonts)
     if (logo_ && !intro_showing())
         list.image(logo_, {kMargin - 8.0f, kTopY - 21.0f, 42.0f, 42.0f}, {0, 0, 1, 1}, kWhite,
                    logo_cutout_ ? 0.0f : 7.0f);
-    ui::text(list, fonts.semibold, "SAHIN", kMargin + 42.0f,
+    ui::text(list, fonts.semibold, "FUTBOL13", kMargin + 42.0f,
                                  centred(kTopY, 22), 22, kInk, gfx::Align::left, 5.0f);
 
     // The sections: words, the active one lit, one gold line gliding under it.
@@ -1883,7 +1885,7 @@ void Screen::draw_stage(const ui::Fonts &fonts)
             app.badge == "Update"                ? "UPDATE AVAILABLE"
             : app.badge == "Installed"           ? "ON THIS CONSOLE"
             : app.catalog_badge == "Coming soon" ? "IN PROGRESS"
-                                                 : "BLUR";
+                                                 : "PES 2013";
         list.push_opacity(alpha);
         list.push_transform(1.0f, 0, 0, dx, 0);
         list.rounded_rect({kMargin, kStageKickerY - 9.0f, 28.0f, 3.0f}, 1.5f, kAccent);
@@ -2215,7 +2217,7 @@ void Screen::draw_grid(const ui::Fonts &fonts)
             : library && !inventory_.complete
                 ? "Installed apps are unavailable until their locations can be read."
             : !query_.empty() ? "Try another app name or developer."
-            : section_ == kUpdates ? "Updates for games installed by Sahin appear here."
+            : section_ == kUpdates ? "Updates for games installed by FUTBOL13 appear here."
             : apps_.empty()   ? "Verified apps will appear here when the catalog is ready."
                               : "Try another section.";
         // While something is on its way an arc draws itself into a full
@@ -2535,13 +2537,13 @@ Screen::Offer Screen::offer(const App &app) const
         const bool newer = catalog::update_available(self_version_, app.available_version);
         out.headline = restart_needed_ ? "Restart to finish"
                        : newer         ? "Update"
-                                       : "This is Sahin";
+                                       : "This is FUTBOL13";
         out.note = newer && !restart_needed_
                        ? self_version_ + "  \xE2\x86\x92  " + app.available_version
                        : "Version " + self_version_;
         out.tone = newer || restart_needed_ ? 1 : 0;
         out.reason = restart_needed_
-                         ? "Close Sahin and open it again to use the new version."
+                         ? "Close FUTBOL13 and open it again to use the new version."
                      : newer ? ""
                              : "You are using it right now.";
         if (newer && !restart_needed_)
@@ -2556,7 +2558,7 @@ Screen::Offer Screen::offer(const App &app) const
             {
                 out.armed = true;
                 out.reason = "The new version is put in place now and starts the next time "
-                             "Sahin is opened.";
+                             "FUTBOL13 is opened.";
             }
         }
         return out;
@@ -2586,10 +2588,10 @@ Screen::Offer Screen::offer(const App &app) const
                  installed->path.ends_with("/" + app.title_id))
         {
             // Installed by hand, and listed in the catalog: it can be handed over.
-            out.label = "Manage with Sahin";
+            out.label = "Manage with FUTBOL13";
             out.primary = Order::Kind::adopt;
             out.armed = installer_;
-            out.reason = installer_ ? "Installed outside Sahin. Hand it over to get its "
+            out.reason = installer_ ? "Installed outside FUTBOL13. Hand it over to get its "
                                       "updates here."
                                     : installer_reason_;
             return out;
@@ -2608,7 +2610,7 @@ Screen::Offer Screen::offer(const App &app) const
         // console first (base-games, kept for repairs).
         if (usable)
         {
-            // The games' own Home apps (PPSA99404, ours) share the prefix: a game writes
+            // The games' own Home apps (PPSA99405, ours) share the prefix: a game writes
             // its registry back when it exits, so nothing changes while one runs. Apps this
             // manager didn't install are none of its business.
             const auto blocking =
@@ -2643,7 +2645,7 @@ Screen::Offer Screen::offer(const App &app) const
             {
                 out.armed = true;
                 out.reason = trs(out.primary == Order::Kind::play
-                                     ? "Hold Square as Sahin starts to come back to this page."
+                                     ? "Hold Square as FUTBOL13 starts to come back to this page."
                                  : base.on_usb
                                      ? "Copies your game from the USB drive to the console first. "
                                        "The USB copy is left as it is."
@@ -2666,7 +2668,8 @@ Screen::Offer Screen::offer(const App &app) const
                 out.note = trs("Follow the steps on the left");
             }
             out.reason = base.state == State::absent
-                             ? trs("Your own copy of Blur, unmodded. Sahin adds what it needs.")
+                             ? trs("Your own copy of PES 2013, with the mods you installed on "
+                                   "the PC. FUTBOL13 copies it as it is.")
                              : base.path;
         }
         return out;
@@ -2681,7 +2684,7 @@ Screen::Offer Screen::offer(const App &app) const
     {
         out.headline = "Not installable";
         out.note = "Published as a disk image";
-        out.reason = "Can't be installed by this version of Sahin";
+        out.reason = "Can't be installed by this version of FUTBOL13";
     }
     else if (!app.local_only)
     {
@@ -2904,7 +2907,7 @@ void Screen::draw_action_box(const ui::Fonts &fonts, std::uint32_t glass, const 
             where = app.installed.front().path;
         if (state.primary == Order::Kind::install_game || state.primary == Order::Kind::play)
             where = trf(app.game_installed ? "In the Wine prefix {0}" : "Installs into the Wine prefix {0}",
-                        {settings_.game_prefix.empty() ? "sahin" : settings_.game_prefix});
+                        {settings_.game_prefix.empty() ? "futbol13" : settings_.game_prefix});
         if (state.primary != Order::Kind::none)
             ui::text(list, fonts.regular, fonts.regular.font->fit(where, 18, w), cx, box.y + 396.0f,
                      18, kInk.with_alpha(0.46f), gfx::Align::center);
@@ -3338,11 +3341,11 @@ void Screen::draw_intro(const ui::Fonts &fonts)
     list.push_opacity(1.0f - tween::smoothstep(intro_leave_ * 2.0f));
     const float name = still ? 1.0f : tween::cubic_out(tween::clamp01((t - 0.45f) / 0.7f));
     if (name > 0.0f)
-        ui::text(list, fonts.semibold, "SAHIN", cx, centred(660.0f, 40), 40,
+        ui::text(list, fonts.semibold, "FUTBOL13", cx, centred(660.0f, 40), 40,
                  kInk.with_alpha(name), gfx::Align::center, tween::lerp(26.0f, 11.0f, name));
     const float source = still ? 1.0f : tween::smoothstep((t - 0.8f) / 0.5f);
     if (source > 0.0f)
-        ui::text(list, fonts.semibold, "BLUR  \xC2\xB7  FOR PS5", cx,
+        ui::text(list, fonts.semibold, "PES 2013  \xC2\xB7  FOR PS5", cx,
                  centred(716.0f, 24), 24,
                  gold.with_alpha(0.92f * source), gfx::Align::center, 2.0f);
     // A longer wait says what it is waiting for, with a line of light running along a track.
@@ -3437,7 +3440,7 @@ void Screen::draw(gfx::Renderer &renderer, const ui::Fonts &fonts)
         detail[details++] = {ui::Button::triangle, trc("Game settings")};
     else if (single_game_.empty() && focused() && !focused()->local_only)
         detail[details++] = {ui::Button::triangle, trc("Refresh")};
-    // The collection is Sahin's own: no other developer is listed here.
+    // The collection is FUTBOL13's own: no other developer is listed here.
     if (focused() && !focused()->local_only && !focused()->author.empty() &&
         !catalog::blackbox_game(focused()->title_id))
         detail[details++] = {ui::Button::right_stick, trc("More by this developer")};
@@ -3468,7 +3471,7 @@ void Screen::draw(gfx::Renderer &renderer, const ui::Fonts &fonts)
         // The bar that fills while Circle is held; full, the store closes.
         const float filled = tween::clamp01((close_hold_ - kCloseDelay) / kCloseHold);
         const float shown = tween::clamp01((close_hold_ - kCloseDelay) / 0.12f);
-        const char *words = trc("Keep holding to close Sahin");
+        const char *words = trc("Keep holding to close FUTBOL13");
         const float width = fonts.semibold.measure(words, 24) + 132.0f;
         const Rect pill{(kWidth - width) * 0.5f, 842.0f, width, 76.0f};
         overlay_.push_opacity(shown);
@@ -3747,7 +3750,7 @@ void Screen::write_about()
         for (const auto &line : debug_lines_)
             blocks.push_back(Block::bullet(line));
     }
-    blocks.push_back(Block::paragraph(trs("Sahin installs, updates and uninstalls apps from "
+    blocks.push_back(Block::paragraph(trs("FUTBOL13 installs, updates and uninstalls apps from "
                                           "your selected homebrew catalog.")));
     blocks.push_back(
         Block::key_value(trs("Version"), self_version_.empty() ? trs("Unknown") : self_version_));
@@ -3766,11 +3769,11 @@ void Screen::write_about()
     blocks.push_back(Block::heading(trs("Please note"), 3));
     blocks.push_back(Block::paragraph(
         trs("Apps are published by their own developers, who are responsible for their content "
-            "and licensing. A listing is not a security audit. Sahin and the catalog come "
+            "and licensing. A listing is not a security audit. FUTBOL13 and the catalog come "
             "without warranty.")));
     blocks.push_back(Block::heading(trs("Where things are"), 3));
-    blocks.push_back(Block::key_value(trs("Store files"), "/data/sahin"));
-    blocks.push_back(Block::key_value(trs("Logs"), "/data/sahin/logs"));
+    blocks.push_back(Block::key_value(trs("Store files"), "/data/futbol13"));
+    blocks.push_back(Block::key_value(trs("Logs"), "/data/futbol13/logs"));
     blocks.push_back(Block::heading(trs("Thanks"), 3));
     blocks.push_back(Block::paragraph(
         trs("ShadowMountPlus by drakmor puts installed apps on the home screen. Built with "
@@ -3917,7 +3920,7 @@ void Screen::update_panel(const InputFrame &input, ui::Feedback &feedback)
             return refuse(feedback, input.nav_repeat, 0.0f, 0.0f);
         }
         settings_.use_official = !settings_.use_official;
-        notify("Catalog settings saved", "Close and reopen Sahin to apply.");
+        notify("Catalog settings saved", "Close and reopen FUTBOL13 to apply.");
     }
     else if (setting == 6)
     {
@@ -3927,8 +3930,8 @@ void Screen::update_panel(const InputFrame &input, ui::Feedback &feedback)
         if (!settings_.custom_active())
             settings_.use_official = true;
         notify("Catalog settings saved", settings_.use_custom
-                                             ? "Close and reopen Sahin to add your catalog."
-                                             : "Close and reopen Sahin to apply.");
+                                             ? "Close and reopen FUTBOL13 to add your catalog."
+                                             : "Close and reopen FUTBOL13 to apply.");
     }
     else if (setting == 7)
     {
@@ -3964,7 +3967,7 @@ void Screen::update_panel(const InputFrame &input, ui::Feedback &feedback)
         settings_.use_official = true;
         settings_.use_custom = false;
         settings_.catalog_url = catalog::kDefaultApi;
-        notify("Official catalog restored", "Close and reopen Sahin to apply.");
+        notify("Official catalog restored", "Close and reopen FUTBOL13 to apply.");
     }
     else
     {
@@ -4076,7 +4079,7 @@ void Screen::draw_panel(const ui::Fonts &fonts, std::uint32_t glass)
 
     // The left: whose room this is, the room's name, and the four rooms.
     constexpr const char *kTabs[] = {"Downloads", "Settings", "About"};
-    ui::text(list, fonts.semibold, "SAHIN", kMargin, 170.0f, 18, kAccent, gfx::Align::left,
+    ui::text(list, fonts.semibold, "FUTBOL13", kMargin, 170.0f, 18, kAccent, gfx::Align::left,
              4.0f);
     ui::text(list, fonts.display, tr(kTabs[panel_tab_]), kMargin - 3.0f, 248.0f, 64, kInk);
     for (int i = 0; i < 3; ++i)
@@ -4262,7 +4265,7 @@ void Screen::draw_panel(const ui::Fonts &fonts, std::uint32_t glass)
         } rows[] = {
             {3, trc("Install location"), trc("Where new apps go: a folder ShadowMountPlus scans."), 0,
              place, true},
-            {4, "Check for a newer Sahin", "Asked once at start; a notice appears.", 1, "",
+            {4, "Check for a newer FUTBOL13", "Asked once at start; a notice appears.", 1, "",
              settings_.check_updates},
             {5, trc("Sounds"), trc("The interface's own sounds."), 1, "", settings_.sounds},
             {6, trc("Vibration"), trc("A light answer from the controller."), 1, "", settings_.vibration},
@@ -4281,7 +4284,7 @@ void Screen::draw_panel(const ui::Fonts &fonts, std::uint32_t glass)
              settings_.verify_signatures},
             {4, "Restore official catalog",
              "Only homebrew.page, with signature checks, next launch.", 2, "Restore", false},
-            {7, "Sahin", "Its page updates it.", 2,
+            {7, "FUTBOL13", "Its page updates it.", 2,
              restart_needed_ ? "Restart to finish"
              : newer         ? "Version " + self->available_version + " available"
                              : "Version " + self_version_ + (self ? ", up to date" : ""),
@@ -4385,8 +4388,8 @@ void Screen::draw_panel(const ui::Fonts &fonts, std::uint32_t glass)
         if (logo_)
             list.image(logo_, {cx - 48.0f, cy - 48.0f, 96.0f, 96.0f}, {0, 0, 1, 1}, kWhite,
                        logo_cutout_ ? 0.0f : 20.0f);
-        ui::text(list, fonts.display, "Sahin", px + 150.0f, panel.y + 98.0f, 52, kInk);
-        ui::text(list, fonts.regular, tr("Blur on the PS5, from your own copy"),
+        ui::text(list, fonts.display, "FUTBOL13", px + 150.0f, panel.y + 98.0f, 52, kInk);
+        ui::text(list, fonts.regular, tr("PES 2013 on the PS5, from your own copy"),
                  px + 152.0f, panel.y + 136.0f, 22, kInk.with_alpha(0.62f));
         const float words = ui::text(list, fonts.regular, tr("Based on ProsperoStore by "), px + 152.0f,
                                      panel.y + 168.0f, 22, kInk.with_alpha(0.62f));

@@ -6,7 +6,7 @@
 # Verifies the pinned ps5-opengl SDK archive, unpacks it into .deps/ps5-opengl and prints the
 # SDK prefix (the directory holding manifest.sha256).
 #
-# Sahin: the SDK's release downloads (github.com/blackbearreloaded/ps5-opengl, v1.0.0) are
+# FUTBOL13: the SDK's release downloads (github.com/blackbearreloaded/ps5-opengl, v1.0.0) are
 # gone, so the SDK is built from source: the repository's ps5-opengl submodule (the fork
 # github.com/mpereiraesaa/ps5-opengl) at `commit`, by tools/build-opengl-sdk.sh (the
 # opengl-sdk step of tools/build.sh), which reads the version and commit from here. The build
@@ -32,7 +32,7 @@ if [[ ! -f $prefix/manifest.sha256 ]]; then
         archive=$PS5_OPENGL_ARCHIVE
     fi
     [[ -f $archive ]] || {
-        echo "no ps5-opengl SDK archive at $archive: build it with Sahin's" \
+        echo "no ps5-opengl SDK archive at $archive: build it with FUTBOL13's" \
             "tools/build.sh opengl-sdk (release/ps5-opengl-sdk-$version.tar.gz)" >&2
         exit 2
     }

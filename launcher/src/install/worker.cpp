@@ -26,7 +26,7 @@ bool worker_path(std::string_view path)
             if (static_cast<unsigned char>(c) < 0x20 || c == 0x7f)
                 return false;
         // The work folder itself is never the target: something inside it is.
-        if (part == "sahin" && end < path.size())
+        if (part == "futbol13" && end < path.size())
             inside = true;
         start = end + 1;
     }
@@ -219,7 +219,7 @@ int worker_unregister(const Connect &connect, const std::string &title, int &cod
 
 bool worker_folder(std::string_view path)
 {
-    constexpr std::string_view name = "/sahin";
+    constexpr std::string_view name = "/futbol13";
     // The same rules as a path inside it, which is what the folder plus a name is.
     return path.size() > name.size() && path.ends_with(name) &&
            worker_path(std::string(path) + "/x");

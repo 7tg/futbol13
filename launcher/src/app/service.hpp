@@ -121,7 +121,7 @@ class Service
     // prefix keeps a test install apart from the live one, its profile named after it).
     std::string plans;
     // Files shipped with the manager (<bundle>/<sha256> plan sources, <bundle>/
-    // bare-prefix-sahin.zip): taken before downloading; empty for none.
+    // bare-prefix-futbol13.zip): taken before downloading; empty for none.
     std::string bundle;
     std::string win_root = "/data/prospero-win";
     std::string game_prefix;

@@ -17,7 +17,7 @@ namespace store::library
 //
 // Keys are written as Windows writes them, one backslash between parts, relative to
 // the file's root (system.reg: HKEY_LOCAL_MACHINE; user.reg: HKEY_CURRENT_USER), e.g.
-// "Software\Wow6432Node\Sahin Games\Blur". Names and keys match
+// "Software\Wow6432Node\FUTBOL13 Games\Blur". Names and keys match
 // without regard to ASCII case, as Windows matches them. The empty name is the key's
 // default value (@).
 class WineRegistry

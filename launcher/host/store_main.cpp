@@ -437,7 +437,7 @@ int main(int argc, char **argv)
                 apps.back().size = entry.size;
                 apps.back().added = entry.added;
             }
-            screen.set_catalog(std::move(apps), "Sahin");
+            screen.set_catalog(std::move(apps), "FUTBOL13");
             const auto picture = [&](const std::string &path, hui::Image &image)
             {
                 std::string encoded;
@@ -493,46 +493,39 @@ int main(int argc, char **argv)
             };
             if (mode.starts_with("mw-"))
             {
-                // Blur's page in one of its install states: mw-ready, mw-old (a 1.2
-                // base copy), mw-installed, mw-busy (Blur's Home app running).
+                // PES 2013's page in one of its install states: mw-ready, mw-installed,
+                // mw-busy (PES 2013's Home app running).
                 store::library::BaseGame base;
-                base.state = mode == "mw-old"       ? store::library::State::needs_patch
-                              : mode == "mw-solo-new" ? store::library::State::absent
-                                                      : store::library::State::ready;
-                base.version = mode == "mw-old" ? "1.2" : "1.3";
-                base.path = "/data/sahin/base-games/BLUR";
+                base.state = mode == "mw-solo-new" ? store::library::State::absent
+                                                   : store::library::State::ready;
+                base.path = "/data/futbol13/base-games/PES2013";
                 if (mode == "mw-solo-usb") // the copy on a USB drive: Install copies it first
                 {
                     base.on_usb = true;
-                    base.path = "/mnt/usb1/BLUR";
+                    base.path = "/mnt/usb1/PES2013";
                 }
-                base.detail = mode == "mw-old" ? "Version 1.2: upgraded to 1.3 as it installs."
-                                               : "Version " + base.version + ".";
+                // The copy is taken as it is: no version to tell.
+                base.detail = store::i18n::trf("Copied as it is, mods and updates included ({0}).",
+                                               {"8.1 GB"});
                 screen.set_installer(true, true, "", "/data/homebrew");
-                screen.set_running(mode == "mw-busy" ? std::vector<std::string>{"PPSA99404"}
+                screen.set_running(mode == "mw-busy" ? std::vector<std::string>{"PPSA99405"}
                                                      : std::vector<std::string>{},
                                    true);
-                // The plan's options, as the Service publishes them.
-                screen.set_base("PPSA99404", base,
-                                mode == "mw-installed" || mode.starts_with("mw-solo-installed"),
-                                {{"online", "Online through Amax",
-                                  "Multiplayer on the Amax community servers (amax-emu.com).", true},
-                                 {"amax-client", "Amax client extras",
-                                  "Amax's client: profile pictures, its Lua plugins and a 60 fps "
-                                  "race cap.",
-                                  false}});
+                // The plan has no options, as the Service publishes it.
+                screen.set_base("PPSA99405", base,
+                                mode == "mw-installed" || mode.starts_with("mw-solo-installed"), {});
                 if (mode.starts_with("mw-solo"))
                 {
                     // The game's own app: its page only (installed, the player quit to it).
-                    screen.set_single_game("PPSA99404");
-                    if (mode == "mw-solo-installed-closed") // Blur closed at once last time
+                    screen.set_single_game("PPSA99405");
+                    if (mode == "mw-solo-installed-closed") // PES 2013 closed at once last time
                         screen.set_single_notice(store::i18n::trs(store::kEarlyExitHint));
                 }
-                assert(screen.open_app("PPSA99404"));
+                assert(screen.open_app("PPSA99405"));
                 settle(90);
                 if (mode == "mw-ask")
                 {
-                    // Install pressed: the question about the option.
+                    // Install pressed.
                     hui::InputFrame press;
                     press.pressed = hui::action_bit(hui::Action::confirm);
                     screen.update(press, 1.0f / 60.0f, feedback);
@@ -556,46 +549,34 @@ int main(int argc, char **argv)
                     screen.update(pick, 1.0f / 60.0f, feedback);
                     settle(40);
                 }
-                else if (mode == "mw-solo-installed-options")
-                {
-                    // A game's own app: the Amax client switched on, so Cross repairs.
-                    screen.update(down, 1.0f / 60.0f, feedback);
-                    settle(8);
-                    screen.update(right, 1.0f / 60.0f, feedback);
-                    settle(30);
-                }
                 else if (mode == "mw-solo-installed-resolution")
                 {
                     // A game's own app: 2560x1440 picked, kept at once; Cross still plays.
-                    for (int i = 0; i < 2; ++i)
-                    {
-                        screen.update(down, 1.0f / 60.0f, feedback);
-                        settle(8);
-                    }
+                    // No options, so the first row is the resolution.
                     screen.update(right, 1.0f / 60.0f, feedback);
                     settle(30);
-                    const auto kept = screen.settings().resolutions.find("PPSA99404");
+                    const auto kept = screen.settings().resolutions.find("PPSA99405");
                     assert(kept != screen.settings().resolutions.end() && kept->second.width == 2560 &&
                            screen.settings_changed &&
                            screen.pending_order.kind == store::Order::Kind::game_settings &&
                            screen.pending_order.resolution.height == 1440);
                     assert(store::parse_settings(store::format_settings(screen.settings()))
-                               .resolutions.at("PPSA99404")
+                               .resolutions.at("PPSA99405")
                                .width == 2560);
                 }
                 else if (mode == "mw-installing" || mode == "mw-solo-installing")
                 {
                     // Downloading, the first stage, the box grown.
-                    screen.set_activity({"PPSA99404", 1, 640u << 20, 1495u << 20, {}, 1,
+                    screen.set_activity({"PPSA99405", 1, 640u << 20, 1495u << 20, {}, 1,
                                          {"Copied to the console; the USB drive can go",
-                                          "Getting Amax client 0.0.0.7 (2 of 3)"}, 0.31f});
+                                          "Copying your game into the prefix"}, 0.31f});
                     settle(60);
                 }
                 else if (mode == "mw-installing-files")
                 {
                     // Further on: the game's files, the stages before it done.
-                    screen.set_activity({"PPSA99404", 6, 1200u << 20, 3000u << 20, {}, 4,
-                                         {"On the console", "All 17 files ready", "Using the prefix pb-blur",
+                    screen.set_activity({"PPSA99405", 6, 1200u << 20, 3000u << 20, {}, 4,
+                                         {"On the console", "All 17 files ready", "Using the prefix pb-futbol13",
                                           "Your copy and the mod files check out",
                                           "Copying your game into the prefix"}, 0.72f});
                     settle(60);
@@ -728,7 +709,7 @@ int main(int argc, char **argv)
             else if (mode == "news")
             {
                 screen.set_news(
-                    {{"2026-10-11-store-060", "2026-10-11T09:00:00Z", "Sahin 1.000.060",
+                    {{"2026-10-11-store-060", "2026-10-11T09:00:00Z", "FUTBOL13 1.000.060",
                       "Developer pages, a News room and a shelf for apps new to the catalog.\n\n"
                       "Open an app and press R3 to see everything else its developer made."},
                      {"2026-10-08-mirror", "2026-10-08T18:00:00Z", "The catalog has a mirror",
@@ -814,7 +795,7 @@ int main(int argc, char **argv)
             }
             else if (mode == "notice")
                 screen.notify("Update available: 01.000.010",
-                              "A newer Sahin is available.");
+                              "A newer FUTBOL13 is available.");
             else if (mode == "scrolled" || mode == "coming-soon")
             {
                 hui::InputFrame move;
@@ -840,13 +821,13 @@ int main(int argc, char **argv)
                     {"PPSA99001", "ProsperoRadio", "01.000.000", "/data/homebrew/PPSA99001", "",
                      false, true, false},
                     {"PPSA99002", "ProsperoLight", "01.000.000", "/data/homebrew/PPSA99002",
-                     "Installed outside Sahin. Not managed by this app.", false, false,
+                     "Installed outside FUTBOL13. Not managed by this app.", false, false,
                      false},
                     {"PPSA99980", "Example local app", "01.000.001", "/mnt/ext1/homebrew/PPSA99980",
-                     "Installed outside Sahin. Not managed by this app.", false, false,
+                     "Installed outside FUTBOL13. Not managed by this app.", false, false,
                      false},
                     {"", "Example.ffpkg", "", "/mnt/ext1/homebrew/Example.ffpkg",
-                     "Image installed outside Sahin. Not managed by this app.", true, false,
+                     "Image installed outside FUTBOL13. Not managed by this app.", true, false,
                      false}};
                 screen.set_inventory(std::move(inventory));
                 screen.set_status("Installed library preview");
@@ -876,7 +857,7 @@ int main(int argc, char **argv)
                     store::system::Inventory inventory;
                     inventory.apps = {{"PPSA99001", "ProsperoRadio", "01.000.005",
                                        "/data/homebrew/PPSA99001",
-                                       "Installed outside Sahin. Not managed by this app.",
+                                       "Installed outside FUTBOL13. Not managed by this app.",
                                        false, false, false}};
                     screen.set_inventory(std::move(inventory));
                 }

@@ -211,7 +211,7 @@ bool square_held()
 
 // The game's last start, for the next start of this app to tell a game that closed at once,
 // or one that was played and ended (store::last_start).
-constexpr const char *kLastStart = "/data/sahin/last-start";
+constexpr const char *kLastStart = "/data/futbol13/last-start";
 
 // The runner's one-shot request to bring this launcher back when the game ends
 // (store::return_request_path): /data/prospero-win/return-<title>.
@@ -228,7 +228,7 @@ std::string return_request()
 [[noreturn]] void play_single_game(const char *why)
 {
     hui::sys::log("[STORE] %s: handing over to /app0/game.bin", why);
-    apply_system_language(store::system::app_folder(), "/data/sahin", system_language());
+    apply_system_language(store::system::app_folder(), "/data/futbol13", system_language());
     const std::string request = return_request();
     // The start record first, then the request only if the record is there: a request left
     // without a record would bring the launcher back to play the game again. Without the
@@ -318,11 +318,11 @@ int main()
     const auto debug_wanted = []
     {
         std::string saved;
-        return hui::save::read_file("/data/sahin/settings.txt", &saved, 4096) &&
+        return hui::save::read_file("/data/futbol13/settings.txt", &saved, 4096) &&
                store::parse_settings(saved).debug_log;
     };
     store::diag::set_enabled(debug_wanted());
-    store::diag::trace("Sahin started");
+    store::diag::trace("FUTBOL13 started");
     store::diag::trace_firmware();
     store::diag::trace("keyboard library 0x%08x, usb keyboards 0x%08x, title registry 0x%08x",
                        static_cast<unsigned>(keyboard_module),
@@ -337,7 +337,7 @@ int main()
 #else
     const auto elevation_status = elevation::request(elevation::Capability::filesystem);
 #endif
-    constexpr const char *storage_root = "/data/sahin";
+    constexpr const char *storage_root = "/data/futbol13";
     const bool elevated = elevation_status == elevation::Status::ok;
     // Wherever the store is installed (system/app_folder.hpp), now that the root may have changed.
     const std::string app_root = store::system::app_folder();
@@ -521,7 +521,7 @@ int main()
                      descriptor >= 0 ? "kept in the store folder" : "nowhere to keep them");
 #ifdef STORE_DEBUG_TRACE
             store::diag::trace("settings: %s", descriptor >= 0
-                                                   ? "kept in /data/sahin (no elevation)"
+                                                   ? "kept in /data/futbol13 (no elevation)"
                                                    : "can't be kept (no store folder)");
 #endif
         }
@@ -633,7 +633,7 @@ int main()
     [[maybe_unused]] std::string press_keys; // development: buttons still to press
     [[maybe_unused]] std::int64_t press_next = 0;
     [[maybe_unused]] bool shot_wanted = false;       // development: save the next frame
-    [[maybe_unused]] std::string shot_name = "shot"; // ... as /data/sahin/dev/<name>.tga
+    [[maybe_unused]] std::string shot_name = "shot"; // ... as /data/futbol13/dev/<name>.tga
     [[maybe_unused]] int bench_step = -1;
     ps5::Ime keyboard;
     bool keyboard_active = false;
@@ -985,7 +985,7 @@ int main()
                 std::string digest;
                 save::read_file(std::string(storage_root) + "/dev/self.sha256", &digest, 80);
                 entry.id = "PPSA99400";
-                entry.name = "Sahin";
+                entry.name = "FUTBOL13";
                 entry.status = "available";
                 entry.format = "zip";
                 entry.version = argument;
@@ -1038,7 +1038,7 @@ int main()
             }
             else if (verb == "fsbench")
             {
-                // The folder to measure, e.g. /data/sahin/staging.
+                // The folder to measure, e.g. /data/futbol13/staging.
                 static std::string bench_root;
                 bench_root = argument;
                 pthread_t thread;
@@ -1161,7 +1161,7 @@ int main()
                                         ? std::string("https://")
                                         : screen.settings().catalog_url,
                                     512, ps5::Ime::Enter::go)
-                    : keyboard.open("Search Sahin", "App name or developer",
+                    : keyboard.open("Search FUTBOL13", "App name or developer",
                                     screen.query());
             sys::log("[STORE] keyboard open=%d", keyboard_active ? 1 : 0);
             if (!keyboard_active)
@@ -1281,7 +1281,7 @@ int main()
 #ifdef STORE_DEVELOPMENT
         if (shot_wanted)
         {
-            // What the TV shows, at half size: /data/sahin/dev/shot.tga.
+            // What the TV shows, at half size: /data/futbol13/dev/shot.tga.
             shot_wanted = false;
             const int w = display.width(), h = display.height(), hw = w / 2, hh = h / 2;
             std::vector<std::uint8_t> pixels(static_cast<std::size_t>(w) * h * 4);
@@ -1306,7 +1306,7 @@ int main()
                     tga.push_back(static_cast<char>(px[0]));
                 }
             const auto error =
-                hui::save::write_atomic("/data/sahin/dev/" + shot_name + ".tga", tga);
+                hui::save::write_atomic("/data/futbol13/dev/" + shot_name + ".tga", tga);
             sys::log("[STORE] shot %dx%d gl=0x%x saved=%d", hw, hh, glGetError(),
                      error.empty() ? 1 : 0);
         }

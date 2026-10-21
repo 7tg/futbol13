@@ -1,4 +1,4 @@
-// Prospero BlackBox - The built-in catalog: Blur.
+// Prospero BlackBox - The built-in catalog: PES 2013.
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "catalog/blackbox.hpp"
 
@@ -7,10 +7,10 @@ namespace store::catalog
 namespace
 {
 constexpr Game kGames[] = {
-    {"PPSA99404", "BLUR", "Blur", "2010-05-25", "sahin",
-     "Arcade racing with power-ups, from your own copy of Blur. Installed with online play "
-     "through Amax and a 4K picture.",
-     true, {0x0b0f2a, 0x1a2a6a, 0x2de2e6, 0x02121c}}, // deep blue, cyan
+    {"PPSA99405", "PES2013", "PES 2013", "2012-09-20", "futbol13",
+     "Football from your own copy of PES 2013, with the squad updates and commentary you "
+     "installed on the PC. 4K picture, one pad per signed-in player.",
+     true, {0x06240f, 0x0f5a2a, 0xf2f6f0, 0x0a2a14}}, // pitch green, white
 };
 } // namespace
 
@@ -35,7 +35,7 @@ Snapshot blackbox_snapshot(const std::string &app_folder)
         Entry entry;
         entry.id = game.id;
         entry.name = game.name;
-        entry.author = "Sahin";
+        entry.author = "FUTBOL13";
         entry.kind = "game";
         entry.status = game.available ? "available" : "coming_soon";
         entry.released = game.released;

@@ -1,4 +1,4 @@
-// Sahin - The words in each language: lookup, fallback, placeholders, capitals and the table's
+// FUTBOL13 - The words in each language: lookup, fallback, placeholders, capitals and the table's
 // shape.
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "app/early_exit.hpp"

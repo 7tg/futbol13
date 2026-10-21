@@ -94,27 +94,27 @@ int main()
     const std::atomic<bool> go{false};
     std::string error;
 
-    // Blur's own plan, as shipped, reads and checks out.
-    InstallPlan blur;
-    assert(load_plan(STORE_ASSETS "/plans/BLUR.json", blur, error));
-    assert(blur.game == "BLUR" && blur.release == "1.2" && blur.prefix == "sahin" &&
-           blur.profile.id == "pb-blur" && blur.profile.width == 3840 && blur.pending.empty() &&
-           blur.game_files.size() == 1 && blur.game_files[0].to == "dsound.dll" &&
-           blur.options.size() == 2 && blur.option("online") && blur.upgrades.empty());
-    // What earlier mod installs left behind is stripped from the copy.
-    assert(blur.strip.size() == 8 && blur.strip[0] == "dsound.dll" && blur.strip[3] == "scripts");
-    // Blur keeps its picture size in its own settings.xml once the player saves the Graphics
-    // page; the plan keeps it to the page's Resolution.
-    assert(blur.user_files.size() == 1 &&
-           blur.user_files[0].file == "AppData/Roaming/Bizarre Creations/Blur/settings.xml" &&
-           blur.user_files[0].element == "shared_graphical_settings" &&
-           blur.user_files[0].attributes ==
-               (std::vector<std::pair<std::string, std::string>>{{"width", "{width}"}, {"height", "{height}"}}));
-    // A save the player puts in saves/Blur is where Blur keeps its own.
-    assert(blur.user_seeds.size() == 1 && blur.user_seeds[0].from == "blursave" &&
-           blur.user_seeds[0].file == "AppData/Roaming/Bizarre Creations/Blur/save/blursave");
+    // PES 2013's own plan, as shipped, reads and checks out: the user's folder as it is, our
+    // dxvk.conf, the save folder seed and the settings.dat with the picture size.
+    InstallPlan pes;
+    assert(load_plan(STORE_ASSETS "/plans/PES2013.json", pes, error));
+    assert(pes.game == "PES2013" && pes.title == "PES 2013" && pes.prefix == "futbol13" &&
+           pes.profile.id == "pb-futbol13" && pes.profile.width == 3840 &&
+           pes.profile.height == 2160 && pes.pending.empty() && pes.game_files.empty() &&
+           pes.options.empty() && pes.strip.empty() && pes.sources.empty() &&
+           pes.upgrades.empty() && pes.user_files.empty());
+    assert(pes.profile.dll_overrides == "d3d9,dxgi=n;dinput8=n,b");
+    assert(pes.texts.size() == 1 && pes.texts[0].to == "dxvk.conf");
+    // A save the player puts in saves/PES2013/save is where PES keeps its own.
+    assert(pes.user_seeds.size() == 1 && pes.user_seeds[0].from == "save" &&
+           pes.user_seeds[0].file == "Documents/KONAMI/Pro Evolution Soccer 2013/save");
+    // PES keeps its picture size in settings.dat; the plan writes the page's Resolution there.
+    assert(pes.user_binaries.size() == 1 &&
+           pes.user_binaries[0].file == "Documents/KONAMI/Pro Evolution Soccer 2013/settings.dat" &&
+           pes.user_binaries[0].bytes.size() == 852 && pes.user_binaries[0].fields.size() == 2 &&
+           pes.user_binaries[0].has_checksum && pes.user_binaries[0].checksum_at == 12);
     std::string profile;
-    assert(profile_text(blur.profile, profile, error));
+    assert(profile_text(pes.profile, profile, error));
 
     // A small game of the same shape: releases told by data.bin, 2.0 current.
     const std::string current(3000, 'c'), older(2000, 'o');

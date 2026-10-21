@@ -2,7 +2,7 @@
 # Prospero BlackBox - One scripted session on a console: launch, requests, clean quit, logs.
 # Copyright (C) 2026 BlackBearReloaded
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""One scripted Sahin session on a console: verify the installed build,
+"""One scripted FUTBOL13 session on a console: verify the installed build,
 launch, send requests, ask the app to quit, collect the log. Never kills.
 
 usage: store-console.py HOST FROZEN_DIR RESULTS_DIR STEP...
@@ -21,9 +21,9 @@ from pathlib import Path
 host, frozen, results = sys.argv[1], Path(sys.argv[2]), Path(sys.argv[3])
 steps = sys.argv[4:]
 TITLE = "PPSA99400"
-STATE = "/data/sahin"
+STATE = "/data/futbol13"
 LOCK = Path(os.environ["PS5_LOCK"]) if os.environ.get("PS5_LOCK") else None
-NAME = "Sahin-run"
+NAME = "FUTBOL13-run"
 HOME = Path.home()
 TOOLS = Path(__file__).resolve().parent
 PROTOCOL = Path(os.environ.get("PS5_PROTOCOL", HOME / "ps5-homebrew-dev-protocol"))

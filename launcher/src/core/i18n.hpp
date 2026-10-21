@@ -1,4 +1,4 @@
-// Sahin - The words the page shows, in the player's language.
+// FUTBOL13 - The words the page shows, in the player's language.
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 

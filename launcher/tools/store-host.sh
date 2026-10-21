@@ -35,7 +35,7 @@ EGL_PLATFORM=surfaceless LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \
 # The collection, from a built app folder (make app): the home page and the stage.
 app=${STORE_APP:-$root/dist/PPSA99400}
 if [[ -d $app/assets/games ]]; then
-    for mode in home intro stage shelf-2 theme--2 theme-1 theme-2 theme-3 mw-ready mw-old mw-installed mw-busy; do
+    for mode in home intro stage shelf-2 theme--2 theme-1 theme-2 theme-3 mw-ready mw-installed mw-busy; do
         args=("$root/assets" "$root/build/snapshots/collection-$mode.png" "$app")
         [[ $mode == home ]] || args+=("$mode")
         EGL_PLATFORM=surfaceless LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \

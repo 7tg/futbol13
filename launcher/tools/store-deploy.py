@@ -109,7 +109,7 @@ if any(n != TITLE for n in copies):
 if mode == "look":
     for extra in sorted(set(installed) - {p.relative_to(frozen).as_posix() for p in local_files()}):
         print(f"  only on console: {extra} ({installed[extra]} bytes)")
-    print(f"[{host}] /data/sahin: {names(ftp, '/data/sahin')}")
+    print(f"[{host}] /data/futbol13: {names(ftp, '/data/futbol13')}")
     ftp.quit()
     sys.exit(0)
 

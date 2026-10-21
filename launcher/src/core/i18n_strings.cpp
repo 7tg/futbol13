@@ -1,4 +1,4 @@
-// Sahin - Every sentence the page shows, in each language.
+// FUTBOL13 - Every sentence the page shows, in each language.
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "core/i18n_strings.hpp"
 
@@ -7,7 +7,7 @@ namespace store::i18n
 
 // A row for each sentence: its English (the key, as the code writes it), then Turkish. {0},
 // {1}... are filled in by the code. An empty column has no translation yet, and the English is
-// shown. The game's own words (Blur, Sahin, Amax, DXVK, Wine, file names, paths, versions) stay
+// shown. The game's own words (PES 2013, FUTBOL13, DXVK, Wine, file names, paths, versions) stay
 // as they are inside a sentence. tools/check-i18n.py keeps this table and the code in step.
 const Row kStrings[] = {
     {{"{0}: cancelled", "{0}: iptal edildi"}},
@@ -31,14 +31,16 @@ const Row kStrings[] = {
       "Bakılacak {0} şey var: Options'a basıp Hakkında'yı açın."}},
     {{"{0} uninstalled", "{0} kaldırıldı"}},
     {{"{0} updated", "{0} güncellendi"}},
-    {{"1. Install Blur, the PC game, on a computer. Leave it unmodded.",
-      "1. PC oyunu Blur'ü bir bilgisayara kurun. Mod eklemeyin."}},
-    {{"2. Copy the whole game folder, the one with Blur.exe, to the PS5: over FTP to "
-      "/data/sahin/base-games/Blur (any case works), or to a USB drive as a folder named Blur at "
-      "its top.",
-      "2. Oyun klasörünün tamamını, Blur.exe'nin olduğu klasörü, PS5'e kopyalayın: FTP ile "
-      "/data/sahin/base-games/Blur içine (büyük küçük harf fark etmez) ya da bir USB belleğin en "
-      "üstüne Blur adlı bir klasör olarak."}},
+    {{"1. Install PES 2013, the PC game, on a computer. Add the squad updates, commentary and "
+      "other patches you want there.",
+      "1. PES 2013'ü, PC oyununu, bir bilgisayara kurun. İstediğiniz kadro güncellemesini, "
+      "spikeri ve diğer yamaları orada ekleyin."}},
+    {{"2. Copy the whole game folder, the one with pes2013.exe and img, to the PS5: over FTP to "
+      "/data/futbol13/base-games/PES2013 (any case works), or to a USB drive as a folder named "
+      "PES2013 at its top.",
+      "2. Oyun klasörünün tamamını, pes2013.exe ile img'nin bulunduğu klasörü, PS5'e "
+      "kopyalayın: FTP ile /data/futbol13/base-games/PES2013 konumuna (büyük küçük harf fark "
+      "etmez) ya da bir USB belleğin en üstüne PES2013 adlı bir klasör olarak."}},
     {{"3. This page notices the copy by itself. Then press Install.",
       "3. Bu sayfa kopyayı kendiliğinden fark eder. Sonra Yükle'ye basın."}},
     {{"A counter in the top-left corner", "Sol üst köşede bir sayaç"}},
@@ -63,18 +65,13 @@ const Row kStrings[] = {
       "Çalışan bir uygulamaya dokunulmaz."}},
     {{"An interrupted {0} was cleaned up.", "Yarım kalan bir {0} işi temizlendi."}},
     {{"Apps are published by their own developers, who are responsible for their content and "
-      "licensing. A listing is not a security audit. Sahin and the catalog come without warranty.",
+      "licensing. A listing is not a security audit. FUTBOL13 and the catalog come without warranty.",
       "Uygulamaları kendi geliştiricileri yayımlar; içerikten ve lisanstan onlar sorumludur. "
-      "Listede olmak bir güvenlik denetimi değildir. Sahin ve katalog garanti vermez."}},
+      "Listede olmak bir güvenlik denetimi değildir. FUTBOL13 ve katalog garanti vermez."}},
     {{"Back", "Geri"}},
     {{"Base game can't be used", "Oyun kopyası kullanılamaz"}},
     {{"Base game needed", "Oyun kopyası gerekli"}},
     {{"Based on ProsperoStore by ", "ProsperoStore temel alınmıştır: "}},
-    {{"Blur closed right after it started. A retail Blur.exe carries SecuROM, which doesn't run "
-      "here.",
-      "Blur başlar başlamaz kapandı. Mağazadan alınan Blur.exe'de SecuROM vardır ve burada "
-      "çalışmaz."}},
-    {{"Blur on the PS5, from your own copy", "Kendi kopyanızdan, PS5'te Blur"}},
     {{"Brought to you by BlackBearReloaded. Free software under the GPL, version 3 or later.",
       "BlackBearReloaded tarafından sunulur. GPL sürüm 3 ya da sonrası ile özgür yazılım."}},
     {{"Builds the game again from the base copy and its mods. Saves stay.",
@@ -91,9 +88,9 @@ const Row kStrings[] = {
     {{"Choose", "Seç"}},
     {{"Close", "Kapat"}},
     {{"Close {0} to install", "Yüklemek için {0} uygulamasını kapatın"}},
-    {{"Close Sahin and open it again to finish. If the old version opens, restart the console "
+    {{"Close FUTBOL13 and open it again to finish. If the old version opens, restart the console "
       "first.",
-      "Bitirmek için Sahin'i kapatıp yeniden açın. Eski sürüm açılırsa önce konsolu yeniden "
+      "Bitirmek için FUTBOL13'ü kapatıp yeniden açın. Eski sürüm açılırsa önce konsolu yeniden "
       "başlatın."}},
     {{"Copied as it is, mods and updates included ({0}).",
       "Olduğu gibi kopyalanır, modlar ve güncellemeler dahil ({0})."}},
@@ -114,6 +111,12 @@ const Row kStrings[] = {
     {{"Downloads", "İndirmeler"}},
     {{"Each game's colours. Left and right choose.", "Her oyunun renkleri. Sol ve sağ ile seçin."}},
     {{"FINISHED", "BİTENLER"}},
+    {{"FUTBOL13 installs, updates and uninstalls apps from your selected homebrew catalog.",
+      "FUTBOL13, seçtiğiniz homebrew kataloğundan uygulama yükler, günceller ve kaldırır."}},
+    {{"FUTBOL13 is finishing its own update. Close it and open it again.",
+      "FUTBOL13 kendi güncellemesini bitiriyor. Kapatıp yeniden açın."}},
+    {{"FUTBOL13 recovered", "FUTBOL13 toparlandı"}},
+    {{"FUTBOL13 will offer its updates from now on.", "FUTBOL13 bundan sonra güncellemelerini sunacak."}},
     {{"Finish", "Bitir"}},
     {{"Finishing", "Bitiriliyor"}},
     {{"Follow the steps on the left", "Soldaki adımları izleyin"}},
@@ -131,8 +134,8 @@ const Row kStrings[] = {
     {{"Game is open", "Oyun açık"}},
     {{"Game settings", "Oyun ayarları"}},
     {{"Getting {0} ({1} of {2})", "{0} alınıyor ({1} / {2})"}},
-    {{"Hold Square as Sahin starts to come back to this page.",
-      "Bu sayfaya dönmek için Sahin başlarken Kare'yi basılı tutun."}},
+    {{"Hold Square as FUTBOL13 starts to come back to this page.",
+      "Bu sayfaya dönmek için FUTBOL13 başlarken Kare'yi basılı tutun."}},
     {{"Hold to close", "Kapatmak için basılı tutun"}},
     {{"Hold to uninstall", "Kaldırmak için basılı tutun"}},
     {{"Home app", "Ana ekran uygulaması"}},
@@ -166,7 +169,7 @@ const Row kStrings[] = {
       "Kayıtlı verileri duruyor. Ana ekrandaki kutusu yeniden başlatınca gider."}},
     {{"Its saves stay in the prefix, and so does the base copy.",
       "Kayıtları prefix'te kalır, oyun kopyası da öyle."}},
-    {{"Keep holding to close Sahin", "Sahin'i kapatmak için basılı tutmayı sürdürün"}},
+    {{"Keep holding to close FUTBOL13", "FUTBOL13'ü kapatmak için basılı tutmayı sürdürün"}},
     {{"Kept in base-games for installs. The USB drive can go.",
       "Yüklemeler için base-games içinde tutuluyor. USB bellek çıkarılabilir."}},
     {{"Logs", "Günlükler"}},
@@ -194,6 +197,11 @@ const Row kStrings[] = {
     {{"On the Home screen", "Ana ekranda"}},
     {{"On the console", "Konsolda"}},
     {{"One moment", "Bir dakika"}},
+    {{"PES 2013 closed right after it started. A copy that doesn't start under Wine on a PC "
+      "won't start here either; check it there first.",
+      "PES 2013 açılır açılmaz kapandı. PC'de Wine altında açılmayan bir kopya burada da "
+      "açılmaz; önce orada deneyin."}},
+    {{"PES 2013 on the PS5, from your own copy", "Kendi kopyanızdan, PS5'te PES 2013"}},
     {{"Performance overlay", "Performans katmanı"}},
     {{"Play", "Oyna"}},
     {{"Please note", "Lütfen dikkat"}},
@@ -222,12 +230,6 @@ const Row kStrings[] = {
     {{"Repeat the problem, then open About.", "Sorunu yineleyin, sonra Hakkında'yı açın."}},
     {{"Resolution", "Çözünürlük"}},
     {{"Rooms", "Odalar"}},
-    {{"Sahin installs, updates and uninstalls apps from your selected homebrew catalog.",
-      "Sahin, seçtiğiniz homebrew kataloğundan uygulama yükler, günceller ve kaldırır."}},
-    {{"Sahin is finishing its own update. Close it and open it again.",
-      "Sahin kendi güncellemesini bitiriyor. Kapatıp yeniden açın."}},
-    {{"Sahin recovered", "Sahin toparlandı"}},
-    {{"Sahin will offer its updates from now on.", "Sahin bundan sonra güncellemelerini sunacak."}},
     {{"Scroll", "Kaydır"}},
     {{"Settings", "Ayarlar"}},
     {{"ShadowMountPlus by drakmor puts installed apps on the home screen. Built with ps5-opengl, "
@@ -306,17 +308,13 @@ const Row kStrings[] = {
       "Kopyanız, modları ve ayarlarıyla. Önce her dosya denetlenir."}},
     {{"Your game copy is never changed. The old install stays until this one checks out.",
       "Oyun kopyanız hiç değiştirilmez. Bu kurulum sağlam çıkana kadar eskisi kalır."}},
-    {{"Your own copy of Blur, unmodded. Sahin adds what it needs.",
-      "Blur'ün kendi kopyanız, modsuz. Gerekenleri Sahin ekler."}},
+    {{"Your own copy of PES 2013, with the mods you installed on the PC. FUTBOL13 copies it as "
+      "it is.",
+      "PC'de kurduğunuz modlarla birlikte kendi PES 2013 kopyanız. FUTBOL13 onu olduğu gibi "
+      "kopyalar."}},
     {{"Your saves and your copy of the game stay. Install puts it back.",
       "Kayıtlarınız ve oyun kopyanız kalır. Yükle onu geri getirir."}},
     // The plan's option titles and descriptions (assets/plans/BLUR.json), by their English.
-    {{"Online through Amax", "Amax ile çevrim içi"}},
-    {{"Multiplayer on the Amax community servers (amax-emu.com).",
-      "Amax topluluk sunucularında (amax-emu.com) çok oyunculu."}},
-    {{"Amax client extras", "Amax istemci ekleri"}},
-    {{"Amax's client: profile pictures, its Lua plugins and a 60 fps race cap.",
-      "Amax'ın istemcisi: profil resimleri, Lua eklentileri ve yarışlarda 60 fps sınırı."}},
 };
 
 const std::size_t kStringCount = sizeof(kStrings) / sizeof(kStrings[0]);

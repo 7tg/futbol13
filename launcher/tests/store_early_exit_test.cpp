@@ -1,4 +1,4 @@
-// Sahin - The game closing right after it started: told from the last start's time.
+// FUTBOL13 - The game closing right after it started: told from the last start's time.
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "app/early_exit.hpp"
 #include <cassert>
@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 
 int main()
 {
-    const fs::path dir = fs::temp_directory_path() / ("sahin-early-exit-" + std::to_string(::getpid()));
+    const fs::path dir = fs::temp_directory_path() / ("futbol13-early-exit-" + std::to_string(::getpid()));
     fs::remove_all(dir);
     fs::create_directories(dir);
     const std::string path = (dir / "last-start").string();
@@ -45,15 +45,15 @@ int main()
     assert(line == std::to_string(now));
     // A folder that isn't there: refused, not thrown.
     assert(!store::mark_start((dir / "nowhere" / "last-start").string(), now));
-    assert(std::string(store::kEarlyExitHint).find("SecuROM") != std::string::npos);
+    assert(std::string(store::kEarlyExitHint).find("PES 2013") != std::string::npos);
 
     // The runner's return request: <its library root>/return-<title>, an empty file.
-    assert(store::return_request_path("/data/prospero-win", "PPSA99404") ==
-           "/data/prospero-win/return-PPSA99404");
-    const std::string request = store::return_request_path(dir.string(), "PPSA99404");
+    assert(store::return_request_path("/data/prospero-win", "PPSA99405") ==
+           "/data/prospero-win/return-PPSA99405");
+    const std::string request = store::return_request_path(dir.string(), "PPSA99405");
     assert(store::request_return(request));
     assert(fs::exists(request) && fs::file_size(request) == 0);
-    assert(!store::request_return((dir / "nowhere" / "return-PPSA99404").string()));
+    assert(!store::request_return((dir / "nowhere" / "return-PPSA99405").string()));
 
     // prepare_launch: record then request, both there on success.
     {

@@ -1,4 +1,4 @@
-// Sahin - The launcher's installer run on the host against a folder (the host install check).
+// FUTBOL13 - The launcher's installer run on the host against a folder (the host install check).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // host-install PLAN.json DATA_ROOT WIN_ROOT [--bare-prefix ZIP] [--size WxH] [option...]

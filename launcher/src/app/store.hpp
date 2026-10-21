@@ -54,7 +54,7 @@ struct App
     // The game's base copy, once the service has looked (base_known).
     library::BaseGame base = {};
     bool base_known = false;
-    bool game_installed = false; // installed into its prefix by Sahin
+    bool game_installed = false; // installed into its prefix by FUTBOL13
     std::vector<library::OptionView> game_options = {}; // what Install can add (the plan's)
     library::Resolution game_resolution = {}; // the plan's picture size: the Resolution row's default
 };
@@ -83,7 +83,7 @@ struct Order
     library::Cursor cursor = library::Cursor::touchpad; // install_game, game_settings (always now)
     library::Resolution resolution = {};                // install_game, game_settings (0: the plan's)
 };
-// What the player chose, kept in /data/sahin/settings.txt.
+// What the player chose, kept in /data/futbol13/settings.txt.
 struct Settings
 {
     std::string location = "/data/homebrew"; // where new apps are installed
@@ -92,7 +92,7 @@ struct Settings
     bool vibration = true;
     bool reduce_motion = false; // no drifting, floating or sliding: things fade instead
     // Records what the store does at each step, for a report: shown in About, written to
-    // /data/sahin/debug-trace.txt (or a USB drive) and the kernel log.
+    // /data/futbol13/debug-trace.txt (or a USB drive) and the kernel log.
     bool debug_log = false;
     std::string catalog_url = catalog::kDefaultApi;
     // The two sources, each switched on or off by itself in Development options. Both on:
@@ -110,7 +110,7 @@ struct Settings
     // keeps that game's.
     std::string theme;
     // The Wine prefix games are installed into: empty (the default) is each game's own, the
-    // plan's (sahin, shared for the cross-game save bonuses); a name keeps a test
+    // plan's (futbol13); a name keeps a test
     // install apart.
     std::string game_prefix;
     // Each collection game's performance overlay (game settings), by title ID; a game not
@@ -198,7 +198,7 @@ class Screen
     }
     // A floating notice in the top-right corner; it leaves after ten seconds.
     void notify(std::string title, std::string body);
-    // A newer Sahin is listed: asked once each time the store opens
+    // A newer FUTBOL13 is listed: asked once each time the store opens
     // (Update now / What's new / Skip), with the release notes in a view of their own.
     // Whether this build and this console can install (reason says why not),
     // whether running apps can be told apart (updates and uninstalls need it),

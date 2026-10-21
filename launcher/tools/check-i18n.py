@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Sahin - Keeps the table of translations and the code that asks for them in step.
+# FUTBOL13 - Keeps the table of translations and the code that asks for them in step.
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Every sentence the code passes to tr(), trs(), trc() or trf() must have a row in
 src/core/i18n_strings.cpp, and every row must have its sentence in both languages with the

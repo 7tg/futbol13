@@ -1,4 +1,4 @@
-// Sahin - The game closing right after it started, told on the launcher's next start; and what
+// FUTBOL13 - The game closing right after it started, told on the launcher's next start; and what
 // that start does: the game, the page, or back to Home.
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "app/early_exit.hpp"

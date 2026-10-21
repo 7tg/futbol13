@@ -15,13 +15,13 @@ namespace
 GameProfile most_wanted()
 {
     GameProfile p;
-    p.comment = {"Blur: written by Sahin."};
+    p.comment = {"Blur: written by FUTBOL13."};
     p.id = "blur";
     p.name = "Blur";
     p.executable = "C:\\Games\\BLUR\\Blur.exe";
     p.working_directory = "C:\\Games\\BLUR";
     p.dll_overrides = "d3d8,d3d9,d3d10core,d3d11,dxgi=n;dinput8,dsound=n,b;d3dx9_26,d3dx9_43=n";
-    p.prefix = "sahin";
+    p.prefix = "futbol13";
     p.width = 3840;
     p.height = 2160;
     p.switches = {{"fast_clock", "true"}, {"shared_input", "true"}, {"thread_scheduling", "true"}};
@@ -41,7 +41,7 @@ int main()
     // Today's console profile, without its [debug] lines.
     std::string text, error;
     assert(profile_text(most_wanted(), text, error));
-    assert(text == "; Blur: written by Sahin.\n"
+    assert(text == "; Blur: written by FUTBOL13.\n"
                    "[application]\n"
                    "id = blur\n"
                    "name = Blur\n"
@@ -49,7 +49,7 @@ int main()
                    "working_directory = C:\\Games\\BLUR\n"
                    "dll_overrides = d3d8,d3d9,d3d10core,d3d11,dxgi=n;dinput8,dsound=n,b;"
                    "d3dx9_26,d3dx9_43=n\n"
-                   "prefix = sahin\n"
+                   "prefix = futbol13\n"
                    "runtime = wine-wow64\n"
                    "architecture = pe32\n"
                    "graphics = dxvk\n"

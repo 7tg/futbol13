@@ -1,4 +1,4 @@
-// Sahin - The table of sentences behind i18n::tr (core/i18n_strings.cpp).
+// FUTBOL13 - The table of sentences behind i18n::tr (core/i18n_strings.cpp).
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 

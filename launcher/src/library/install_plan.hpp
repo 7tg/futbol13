@@ -85,7 +85,7 @@ struct UserFile
 // replaced. Folders on the way are made. A missing <from> copies nothing.
 // <from> may be a folder: every file under it is copied to <file>/<relative path> where
 // that user has none.
-//   "user_seeds": [{"from": "blursave", "file": "AppData/Roaming/.../save/blursave"}]
+//   "user_seeds": [{"from": "save", "file": "Documents/KONAMI/Pro Evolution Soccer 2013/save"}]
 struct UserSeed
 {
     std::string from; // relative to saves/<game>
@@ -171,7 +171,7 @@ struct InstallPlan
         bool rtpatch = false;
     };
     std::vector<Upgrade> upgrades;
-    // What the user may add at Install (Blur's "Amax client extras"): each adds its files,
+    // What the user may add at Install (an online client, say): each adds its files,
     // edits and expected hashes to the plan's, and its dll_overrides to the profile's.
     // Its sources are in the plan's list; only the chosen options' are fetched.
     struct Option
