@@ -1,6 +1,7 @@
 # FUTBOL13
 
 [![Downloads](https://img.shields.io/github/downloads/7tg/futbol13/total?label=downloads)](https://github.com/7tg/futbol13/releases)
+[![Visits](https://hits.sh/github.com/7tg/futbol13.svg?label=visits)](https://hits.sh/github.com/7tg/futbol13/)
 [![ProsperoStore](https://img.shields.io/badge/ProsperoStore-PPSA99405-0070d1?logo=playstation&logoColor=white)](https://prosperostore.net/app/PPSA99405/)
 
 FUTBOL13 runs your own copy of the PC game *Pro Evolution Soccer 2013* (Konami, 2012) on a
